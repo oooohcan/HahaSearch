@@ -31,3 +31,6 @@ CREATE TABLE user(
                      search_status TINYINT DEFAULT 0 NOT NULL   COMMENT 'search_status 搜索权限，0-全部，1-禁用高级搜索，2-禁用搜索' ,
                      PRIMARY KEY (id)
 ) COMMENT = 'user 用户表';
+
+alter table user
+    change tenant_id tenant_code varchar(128) null comment 'tenant_code 租户码';

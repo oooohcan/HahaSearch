@@ -7,7 +7,7 @@ import edu.zuel.hahasearch.mapper.TenantMapper;
 import org.springframework.stereotype.Service;
 
 /**
-* @author SydZh
+* @author oooohcan
 * @description 针对表【tenant(tenant 租户表)】的数据库操作Service实现
 * @createDate 2023-07-06 15:58:13
 */

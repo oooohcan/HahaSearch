@@ -63,7 +63,7 @@ public class User implements Serializable {
     /**
      * tenant_id 租户id
      */
-    private Integer tenantId;
+    private String tenantCode;
 
     /**
      * user_role 用户角色，0-普通用户，1-管理员

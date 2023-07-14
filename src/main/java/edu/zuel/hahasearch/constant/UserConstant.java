@@ -15,5 +15,8 @@ public interface UserConstant {
      * 管理员权限
      */
     int ADMIN_ROLE = 1;
-    
+    /**
+     * 租户码，用于租户数据隔离
+     */
+    String [] TENANT_CODE_LIST = {"zuel","test"};
 }
