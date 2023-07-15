@@ -56,11 +56,6 @@ public class User implements Serializable {
     private String avatarUrl;
 
     /**
-     * salt 加密盐
-     */
-    private String salt;
-
-    /**
      * tenant_id 租户id
      */
     private String tenantCode;

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author oooohcan
  */
 @Data
-public class BaseRespone<T> implements Serializable {
+public class BaseResponse<T> implements Serializable {
     private int code;
 
     private T data;
@@ -19,22 +19,22 @@ public class BaseRespone<T> implements Serializable {
 
     private String description;
 
-    public BaseRespone(int code, T data, String message,String description) {
+    public BaseResponse(int code, T data, String message, String description) {
         this.code = code;
         this.data = data;
         this.message = message;
         this.description=description;
     }
 
-    public BaseRespone(int code, T data,String message) {
+    public BaseResponse(int code, T data, String message) {
         this(code,data,message,"");
     }
 
-    public BaseRespone(int code, T data){
+    public BaseResponse(int code, T data){
         this(code,data,"","");
     }
 
-    public  BaseRespone(ErrorCode errorCode){
+    public BaseResponse(ErrorCode errorCode){
         this(errorCode.getCode(),null,errorCode.getMessage(),errorCode.getDescription());
     }
 }

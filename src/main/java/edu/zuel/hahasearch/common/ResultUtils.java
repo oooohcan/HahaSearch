@@ -13,8 +13,8 @@ public class ResultUtils {
      * @return
      * @param <T>
      */
-    public static <T> BaseRespone<T> success(T data){
-        return new BaseRespone<>(0,data,"ok");
+    public static <T> BaseResponse<T> success(T data){
+        return new BaseResponse<>(0,data,"ok");
     }
 
     /**
@@ -23,8 +23,8 @@ public class ResultUtils {
      * @param errorCode
      * @return
      */
-    public static BaseRespone error(ErrorCode errorCode){
-        return new BaseRespone<>(errorCode);
+    public static BaseResponse error(ErrorCode errorCode){
+        return new BaseResponse<>(errorCode);
     }
 
     /**
@@ -34,8 +34,8 @@ public class ResultUtils {
      * @param description
      * @return
      */
-    public static BaseRespone error(ErrorCode errorCode,String description){
-        return new BaseRespone<>(errorCode.getCode(),null,errorCode.getMessage(),description);
+    public static BaseResponse error(ErrorCode errorCode, String description){
+        return new BaseResponse<>(errorCode.getCode(),null,errorCode.getMessage(),description);
     }
 
     /**
@@ -46,8 +46,8 @@ public class ResultUtils {
      * @param description
      * @return
      */
-    public static BaseRespone error(ErrorCode errorCode,String message,String description){
-        return new BaseRespone<>(errorCode.getCode(),null,message,description);
+    public static BaseResponse error(ErrorCode errorCode, String message, String description){
+        return new BaseResponse<>(errorCode.getCode(),null,message,description);
     }
 
     /**
@@ -58,7 +58,7 @@ public class ResultUtils {
      * @param description
      * @return
      */
-    public static BaseRespone error(int code,String message,String description){
-        return new BaseRespone<>(code,null,message,description);
+    public static BaseResponse error(int code, String message, String description){
+        return new BaseResponse<>(code,null,message,description);
     }
 }

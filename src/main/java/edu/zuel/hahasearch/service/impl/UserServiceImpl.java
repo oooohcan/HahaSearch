@@ -80,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserAccount(userAccount);
         user.setUserPwd(encryptPassword);
         user.setTenantCode(tenantCode);
+        user.setUserName(userAccount);
         boolean saveResult = this.save(user);
         if(!saveResult){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"数据插入失败");
@@ -140,7 +141,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public boolean deleteUser(long id, HttpServletRequest request) {
-        if(isAdmin(getLoginUser(request))){
+        if(isAdmin(request)){
             throw new BusinessException(ErrorCode.NO_AUTH,"无管理员权限");
         }
         if(id < 0){
@@ -168,6 +169,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return user != null && user.getUserRole() == UserConstant.ADMIN_ROLE;
+    }
+
+    @Override
     public boolean isAdmin(User loginuser) {
         return loginuser != null && loginuser.getUserRole() == UserConstant.ADMIN_ROLE;
     }
@@ -190,6 +198,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return null;
         }
         User safetyUser = new User();
+        safetyUser.setId(user.getId());
         safetyUser.setUserName(user.getUserName());
         safetyUser.setUserAccount(user.getUserAccount());
         safetyUser.setAvatarUrl(user.getAvatarUrl());

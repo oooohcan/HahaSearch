@@ -13,7 +13,6 @@
             <result property="userAccount" column="user_account" jdbcType="VARCHAR"/>
             <result property="userPwd" column="user_pwd" jdbcType="VARCHAR"/>
             <result property="avatarUrl" column="avatar_url" jdbcType="VARCHAR"/>
-            <result property="salt" column="salt" jdbcType="VARCHAR"/>
             <result property="tenantCode" column="tenant_code" jdbcType="VARCHAR"/>
             <result property="userRole" column="user_role" jdbcType="TINYINT"/>
             <result property="searchStatus" column="search_status" jdbcType="TINYINT"/>
@@ -22,7 +21,7 @@
     <sql id="Base_Column_List">
         id,is_deleted,create_time,
         update_time,user_name,user_account,
-        user_pwd,avatar_url,salt,
+        user_pwd,avatar_url,
         tenant_code,user_role,search_status
     </sql>
 </mapper>
