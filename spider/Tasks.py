@@ -25,6 +25,11 @@ class BasicTask:
         with self.condition:
             self.paused = True
 
+    def continue_task(self):
+        with self.condition:
+            self.waiting = False
+            self.condition.notify()
+
     def resume_task(self):
         with self.condition:
             self.paused = False
@@ -33,6 +38,9 @@ class BasicTask:
     def cancel_task(self):
         with self.condition:
             self.cancelled = True
+            self.paused = False
+            self.waiting = False
+            self.condition.notify()
 
     def is_finished(self) -> bool:
         pass
@@ -127,6 +135,8 @@ class SpiderHtml(BasicTask):
             with self.condition:
                 if self.cancelled:
                     break
+                while self.waiting:
+                    self.condition.wait()
                 while self.paused:
                     self.condition.wait()
 
@@ -145,13 +155,14 @@ class SpiderHtml(BasicTask):
             # 保存网页内容为html文件
             self.save_html(html_content)
 
-            links = find_links(html_content)
             temp = ''
-            for link in links:
-                link = str(link)
-                if link.startswith('http'):
-                    q.put(link)
-                    temp = link
+            if level < self.deep:
+                links = find_links(html_content)
+                for link in links:
+                    link = str(link)
+                    if link.startswith('http'):
+                        q.put(link)
+                        temp = link
 
             if url == last:
                 level += 1

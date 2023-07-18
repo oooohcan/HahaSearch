@@ -45,7 +45,7 @@ class TaskPool:
                 return False
             self.waiting.append(task)
             if len(self.running) < MAX_RUNNING:
-                task.paused = False
+                task.waiting = False
                 self.running.append(task)
                 self.waiting.remove(task)
             task.start_task()
@@ -68,7 +68,23 @@ class TaskPool:
                     return True
         return False
 
+    def continue_task(self, index: int):
+        # 唤醒因执行队列满而阻塞的进程
+        with self.lock:
+            for it in self.waiting:
+                it: BasicTask
+                if it.index == index:
+                    if len(self.running) >= MAX_RUNNING:
+                        return False
+                    if it.paused:
+                        return False
+                    it.continue_task()
+                    self.running.append(it)
+                    self.waiting.remove(it)
+                    return True
+
     def resume_task(self, index: int):
+        # 唤醒人为阻塞的进程
         with self.lock:
             for it in self.waiting:
                 it: BasicTask
@@ -76,8 +92,6 @@ class TaskPool:
                     if len(self.running) >= MAX_RUNNING:
                         return False
                     it.resume_task()
-                    self.running.append(it)
-                    self.waiting.remove(it)
                     return True
         return False
 
