@@ -3,7 +3,7 @@ from flask import request, Flask
 from flask_cors import CORS
 
 import private
-# from test.gptcode import sched, check_receive
+from ScheFun import sched, check_pool
 
 app = Flask(__name__)
 app.config.from_object(private)
@@ -35,10 +35,10 @@ def start_job():
 
 
 if __name__ == '__main__':
-    # sched.add_job(id='check_receive',
-    #               func=check_receive,
-    #               trigger='interval',
-    #               seconds=1,
-    #               max_instances=4)
+    sched.add_job(id='check_pool',
+                  func=check_pool,
+                  trigger='interval',
+                  seconds=1,
+                  max_instances=4)
     sched.start()
     app.run(debug=True, host="0.0.0.0", port=private.MY_APP_PORT)
