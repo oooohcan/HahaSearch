@@ -62,7 +62,7 @@ public class Template implements Serializable {
     private String searchs;
 
     /**
-     * is_public 是否公开，0-公开，1-不公开
+     * is_public 是否公开，0-不公开，1-公开
      */
     private Integer isPublic;
 

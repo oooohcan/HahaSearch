@@ -62,6 +62,6 @@ create table template
     style         varchar(64)                        null comment 'style 样式',
     button        int                                null comment 'button 按钮类型',
     searchs       varchar(128)                       null comment 'searchs 高级检索类型 json 列表',
-    is_public     tinyint  default 0                 not null comment 'is_public 是否公开，0-公开，1-不公开'
+    is_public     tinyint  default 0                 not null comment 'is_public 是否公开，0-不公开，1-公开'
 )
     comment 'template 模板表';
