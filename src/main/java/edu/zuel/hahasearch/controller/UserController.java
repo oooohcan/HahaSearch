@@ -69,6 +69,13 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
+    /**
+     * 获取所有用户
+     * @param current
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/list")
     public BaseResponse<Page<User>> listUsers(long current, long size, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
@@ -79,6 +86,14 @@ public class UserController {
         return ResultUtils.success(safetyUserPage);
     }
 
+    /**
+     * 按用户名搜索用户
+     * @param username
+     * @param current
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/search")
     public BaseResponse<Page<User>> searchUsers(String username, long current, long size,HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
@@ -101,6 +116,29 @@ public class UserController {
         }
         User loginUser = userService.getLoginUser(request);
         int result = userService.updateUser(user, loginUser);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 用户权限修改，0-搜索所有，1-禁用高级搜索，2-禁用所有搜索
+     * @param searchStatus
+     * @param userId
+     * @param request
+     * @return
+     */
+    @PostMapping("/updatess")
+    public BaseResponse<Integer> updateSearchStatus(Integer searchStatus, Integer userId,HttpServletRequest request){
+        if(StringUtils.isAnyBlank(String.valueOf(searchStatus),String.valueOf(userId))){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if( searchStatus < 0 || searchStatus >2){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"权限码错误");
+        }
+        User newUser = new User();
+        newUser.setId(userId);
+        newUser.setSearchStatus(searchStatus);
+        User loginUser = userService.getLoginUser(request);
+        int result = userService.updateUser(newUser, loginUser);
         return ResultUtils.success(result);
     }
 
