@@ -205,6 +205,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setTenantCode(user.getTenantCode());
         safetyUser.setUserRole(user.getUserRole());
         safetyUser.setSearchStatus(user.getSearchStatus());
+        safetyUser.setCreateTime(user.getCreateTime());
+        safetyUser.setUpdateTime(user.getUpdateTime());
         return safetyUser;
     }
 
