@@ -169,4 +169,4 @@ class SpiderHtml(BasicTask):
                 last = temp
             self.success += 1
 
-        print(self.get_progress())
+        # print(self.get_progress())
