@@ -1,6 +1,7 @@
 package edu.zuel.hahasearch.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.zuel.hahasearch.common.BaseResponse;
 import edu.zuel.hahasearch.common.ErrorCode;
 import edu.zuel.hahasearch.common.ResultUtils;
@@ -68,17 +69,33 @@ public class UserController {
         return ResultUtils.success(safetyUser);
     }
 
+    /**
+     * 获取所有用户
+     * @param current
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/list")
-    public BaseResponse<List<User>> listUsers(HttpServletRequest request) {
+    public BaseResponse<Page<User>> listUsers(long current, long size, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
-        List<User> userList = userService.list().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
-        return ResultUtils.success(userList);
+        Page<User> userPage = userService.page(new Page<>(current,size));
+        Page<User> safetyUserPage = userPage.setRecords(userPage.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList()));
+        return ResultUtils.success(safetyUserPage);
     }
 
+    /**
+     * 按用户名搜索用户
+     * @param username
+     * @param current
+     * @param size
+     * @param request
+     * @return
+     */
     @GetMapping("/search")
-    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
+    public BaseResponse<Page<User>> searchUsers(String username, long current, long size,HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
@@ -86,9 +103,9 @@ public class UserController {
         if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("user_name", username);
         }
-        List<User> userList = userService.list(queryWrapper);
-        List<User> list = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
-        return ResultUtils.success(list);
+        Page<User> userPage = userService.page(new Page<>(current,size),queryWrapper);
+        Page<User> safetyUserPage = userPage.setRecords(userPage.getRecords().stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList()));
+        return ResultUtils.success(safetyUserPage);
     }
 
     @PostMapping("/update")
@@ -99,6 +116,29 @@ public class UserController {
         }
         User loginUser = userService.getLoginUser(request);
         int result = userService.updateUser(user, loginUser);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 用户权限修改，0-搜索所有，1-禁用高级搜索，2-禁用所有搜索
+     * @param searchStatus
+     * @param userId
+     * @param request
+     * @return
+     */
+    @PostMapping("/updatess")
+    public BaseResponse<Integer> updateSearchStatus(Integer searchStatus, Integer userId,HttpServletRequest request){
+        if(StringUtils.isAnyBlank(String.valueOf(searchStatus),String.valueOf(userId))){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if( searchStatus < 0 || searchStatus >2){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"权限码错误");
+        }
+        User newUser = new User();
+        newUser.setId(userId);
+        newUser.setSearchStatus(searchStatus);
+        User loginUser = userService.getLoginUser(request);
+        int result = userService.updateUser(newUser, loginUser);
         return ResultUtils.success(result);
     }
 
