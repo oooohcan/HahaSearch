@@ -1,5 +1,5 @@
 import threading
-from private import MAX_JOB, MAX_RUNNING
+from Config import MAX_JOB, MAX_RUNNING
 from Tasks import BasicTask
 
 
@@ -8,13 +8,6 @@ class TaskPool:
         self.lock = threading.Lock()
         self.waiting = []
         self.running = []
-        self.ids = [i for i in range(0, MAX_JOB)]
-
-    def get_index(self):
-        with self.lock:
-            if len(self.ids) == 0:
-                return -1
-            return self.ids.pop(0)
 
     def get_task(self, index: int):
         with self.lock:
@@ -25,7 +18,7 @@ class TaskPool:
             for it in self.running:
                 if it.index == index:
                     return it
-        return None
+        raise Exception('任务不存在')
 
     def get_all_task(self):
         with self.lock:
@@ -40,16 +33,19 @@ class TaskPool:
             return self.waiting
 
     def add_task(self, task: BasicTask):
+        if task.index is None or task.index < 0:
+            raise Exception('任务索引无效')
         with self.lock:
-            if len(self.waiting)+len(self.running) >= MAX_JOB or task.index in self.ids:
-                return False
+            if task.index in [it.index for it in self.waiting + self.running]:
+                raise Exception('任务已存在')
+            if len(self.waiting)+len(self.running) >= MAX_JOB:
+                raise Exception('任务队列已满')
             self.waiting.append(task)
             if len(self.running) < MAX_RUNNING:
                 task.waiting = False
                 self.running.append(task)
                 self.waiting.remove(task)
             task.start_task()
-        return True
 
     def cancel_task(self, index: int):
         with self.lock:
@@ -57,18 +53,16 @@ class TaskPool:
                 it: BasicTask
                 if it.index == index:
                     it.cancel_task()
-                    self.ids.append(index)
                     self.waiting.remove(it)
                     print(f'任务{it.index}已被人为取消')
-                    return True
+                    return
             for it in self.running:
                 if it.index == index:
                     it.cancel_task()
-                    self.ids.append(index)
                     self.running.remove(it)
                     print(f'任务{it.index}已被人为取消')
-                    return True
-        return False
+                    return
+        raise Exception('任务不存在')
 
     def continue_task(self, index: int):
         # 唤醒因执行队列满而阻塞的进程
@@ -88,17 +82,20 @@ class TaskPool:
     def resume_task(self, index: int):
         # 唤醒人为阻塞的进程
         with self.lock:
-            for it in self.waiting:
-                it: BasicTask
-                if it.index == index:
-                    it.resume_task()
-                    return True
-            for it in self.running:
-                it: BasicTask
-                if it.index == index:
-                    it.resume_task()
-                    return True
-        return False
+            try:
+                for it in self.waiting:
+                    it: BasicTask
+                    if it.index == index:
+                        it.resume_task()
+                        return
+                for it in self.running:
+                    it: BasicTask
+                    if it.index == index:
+                        it.resume_task()
+                        return
+            except Exception as e:
+                raise e
+        raise Exception('任务不存在')
 
     def pause_task(self, index: int):
         # 人为阻塞某个进程
@@ -110,14 +107,14 @@ class TaskPool:
                     self.running.remove(it)
                     self.waiting.append(it)
                     print(f'任务{it.index}被人为阻塞')
-                    return True
+                    return
             for it in self.waiting:
                 it: BasicTask
                 if it.index == index:
                     it.pause_task()
                     print(f'任务{it.index}被人为阻塞')
-                    return True
-        return False
+                    return
+        raise Exception('任务不存在')
 
     def check_pool(self):
         with self.lock:
@@ -125,7 +122,6 @@ class TaskPool:
                 it: BasicTask
                 if it.is_finished():
                     self.running.remove(it)
-                    self.ids.append(it.index)
                     print(f'任务{it.index}已完成',
                           f'任务{it.index}进度{it.get_progress()}')
                 elif it.paused:
@@ -141,5 +137,5 @@ class TaskPool:
                         self.running.append(it)
                         self.waiting.remove(it)
                         print(f'任务{it.index}已开始')
-                    else:
-                        print(f'任务{it.index}被人为阻塞')
+                    # else:
+                    #     print(f'任务{it.index}被人为阻塞')
