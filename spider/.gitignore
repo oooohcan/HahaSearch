@@ -2,3 +2,5 @@ test.*
 /__pycache__/
 /test
 private.*
+Config.py
+file/

@@ -1,20 +1,23 @@
-import pathlib
-from ServeTools import *
+from pathlib import Path
 import queue
 import requests
 import threading
-# from time import sleep
+from time import sleep
+from random import randint
+
+from ServeTools import *
 
 
 class BasicTask:
-    def __init__(self, index: int):
+    def __init__(self, index: int, name: str):
         self.total = 0
         self.success = 0
         self.fail = 0
         self.cancelled = False
         self.waiting = True
         self.paused = False
-        self.index = index
+        self.index = int(index)
+        self.name = name
         # self.condition = threading.Lock()
         self.condition = threading.Condition()
 
@@ -32,15 +35,21 @@ class BasicTask:
 
     def resume_task(self):
         with self.condition:
-            self.paused = False
-            self.condition.notify()
+            try:
+                self.paused = False
+                self.condition.notify()
+            except:
+                raise Exception('任务并未被暂停')
 
     def cancel_task(self):
         with self.condition:
             self.cancelled = True
             self.paused = False
             self.waiting = False
-            self.condition.notify()
+            try:
+                self.condition.notify()
+            except:
+                pass
 
     def is_finished(self) -> bool:
         pass
@@ -68,17 +77,28 @@ class BasicTask:
             'rate': float(self.success) / float(self.total) if self.total > 0 else 0
         }
 
+    def get_info(self) -> dict:
+        return {
+            'index': self.index,
+            'name': self.name,
+            'property': 'paused' if self.paused else 'waiting' if self.waiting else 'running' if not self.is_finished() else 'finished',
+            'total': self.total,
+            'success': self.success,
+            'fail': self.fail,
+            'rate': float(self.success) / float(self.total) if self.total > 0 else 0,
+        }
 
-class SpiderHtml(BasicTask):
 
-    def __init__(self, index: int, target: str, save_path: str, save_name: str, deep: int = 0, headers: dict = dict()):
-        super().__init__(index)
+class HttpTask(BasicTask):
+
+    def __init__(self, index: int, name: str, target: str, save_path: str, deep: int = 0, headers: dict = dict()):
+        super().__init__(index, name)
 
         if len(target) == 0:
             raise ValueError('url is empty')
-        if len(save_path) == 0:
+        if len(str(save_path)) == 0:
             raise ValueError('save_path is empty')
-        if len(save_name) == 0 or not check_file_name(save_name):
+        if len(name) == 0 or not check_file_name(name):
             raise ValueError('save_name is invalid')
         if deep < 0 or deep > 5:
             raise ValueError('deep is invalid')
@@ -87,7 +107,7 @@ class SpiderHtml(BasicTask):
 
         self.target = target
         self.save_path = save_path
-        self.save_name = save_name
+        self.save_name = name
         self.deep = deep
         self.headers = headers
 
@@ -110,11 +130,14 @@ class SpiderHtml(BasicTask):
     def save_html(self, html_content: str):
         # 保存网页内容为html文件
         file_name = f'{self.save_name}_{self.success}.html'
-        file_path = pathlib.Path(self.save_path) / file_name
-        if not pathlib.Path(self.save_path).exists():
-            pathlib.Path(self.save_path).mkdir(parents=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        file_path = Path(self.save_path) / file_name
+        if not Path(self.save_path).exists():
+            Path(self.save_path).mkdir(parents=True)
+        try:
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+        except:
+            raise Exception('error: ' + file_name)
 
     def start_task(self):
         # 新建spider_html线程
@@ -124,13 +147,14 @@ class SpiderHtml(BasicTask):
     def spider_html(self):
         '''
         爬取网页的源代码,并保存为html文件
-        当网页中存在指向其他网页的链接时,将会递归爬取,直到递归深度达到deep
+        当网页中存在指向其他网页的链接时,将会广度遍历爬取,直到层数达到deep
         html文件将会保存在save_path中,文件名为save_name
         '''
         level = 0
         last = self.target
         q = queue.Queue()
         q.put(self.target)
+        self.total = 1
         while not q.empty() and level <= self.deep:
             with self.condition:
                 if self.cancelled:
@@ -141,27 +165,26 @@ class SpiderHtml(BasicTask):
                     self.condition.wait()
 
             url = q.get()
-            self.total += 1
 
+            html_text = ''
             # 获取网页内容
-            html_content = ''
             try:
-                html_content = self.get_html(url)
+                html_text = self.get_html(url)
+                # 保存网页内容为html文件
+                self.save_html(html_text)
             except Exception as e:
                 print(e)
                 self.fail += 1
                 continue
 
-            # 保存网页内容为html文件
-            self.save_html(html_content)
-
             temp = ''
             if level < self.deep:
-                links = find_links(html_content)
+                links = find_links(html_text)
                 for link in links:
                     link = str(link)
                     if link.startswith('http'):
                         q.put(link)
+                        self.total += 1
                         temp = link
 
             if url == last:
@@ -169,4 +192,10 @@ class SpiderHtml(BasicTask):
                 last = temp
             self.success += 1
 
+            sleep(randint(1, 3))
+
         # print(self.get_progress())
+
+
+class FtpTask(BasicTask):
+    pass
