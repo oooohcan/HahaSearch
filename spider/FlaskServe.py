@@ -104,3 +104,9 @@ def get_waiting_tasks_serve(js: dict):
         return tenantPool.get_waiting_tasks(code)
     except Exception as e:
         return response_wrong(str(e))
+
+
+def get_headers_serve():
+    return response_success(
+        BasicTask.get_headers()
+    )

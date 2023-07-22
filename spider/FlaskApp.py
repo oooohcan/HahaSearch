@@ -67,6 +67,11 @@ def get_waiting_tasks():
     return get_waiting_tasks_serve(js)
 
 
+@app.route('/get_headers', methods=['GET', 'POST'])
+def get_headers():
+    return get_headers_serve()
+
+
 if __name__ == '__main__':
     sched.init_app(app)
     sched.add_job(id='check_pool',
