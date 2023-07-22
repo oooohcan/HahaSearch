@@ -18,11 +18,11 @@ class TenantPool:
             if not code in self.tenants.keys():
                 self.tenants[code] = Tenant(code)
 
-    def get_tenant(self, code: str):
-        with self.lock:
-            if code in self.tenants.keys():
-                return self.tenants[code]
-        return None
+    # def get_tenant(self, code: str):
+    #     with self.lock:
+    #         if code in self.tenants.keys():
+    #             return self.tenants[code]
+    #     return None
 
     def check_task(self):
         with self.lock:

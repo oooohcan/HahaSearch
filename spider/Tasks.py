@@ -54,7 +54,7 @@ class BasicTask:
     def is_finished(self) -> bool:
         pass
 
-    def get_agents(self) -> list:
+    def get_headers() -> dict:
         user_agents = [
             # chrome
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36',
@@ -67,7 +67,7 @@ class BasicTask:
             # android
             'Mozilla/5.0 (Linux; Android 9; SM-G965F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.143 Mobile Safari/537.36'
         ]
-        return user_agents
+        return {'user_agent': user_agents}
 
     def get_progress(self) -> dict:
         return {
@@ -78,15 +78,7 @@ class BasicTask:
         }
 
     def get_info(self) -> dict:
-        return {
-            'index': self.index,
-            'name': self.name,
-            'property': 'paused' if self.paused else 'waiting' if self.waiting else 'running' if not self.is_finished() else 'finished',
-            'total': self.total,
-            'success': self.success,
-            'fail': self.fail,
-            'rate': float(self.success) / float(self.total) if self.total > 0 else 0,
-        }
+        pass
 
 
 class HttpTask(BasicTask):
@@ -105,11 +97,28 @@ class HttpTask(BasicTask):
         if not isinstance(headers, dict):
             raise ValueError('headers is invalid')
 
+        def rand_header():
+            agents = BasicTask.get_headers()['user_agent']
+            print('rand_header')
+            return {'user_agent': agents[randint(0, len(agents) - 1)]}
+
         self.target = target
         self.save_path = save_path
         self.save_name = name
         self.deep = deep
-        self.headers = headers
+        self.headers = headers if len(headers) > 0 else rand_header()
+
+    def get_info(self) -> dict:
+        return {
+            'index': self.index,
+            'name': self.name,
+            'property': 'paused' if self.paused else 'waiting' if self.waiting else 'running' if not self.is_finished() else 'finished',
+            'total': self.total,
+            'success': self.success,
+            'fail': self.fail,
+            'rate': round(float(self.success) / float(self.total), 3) if self.total > 0 else 0,
+            'type': 'http'
+        }
 
     def is_finished(self) -> bool:
         return self.fail + self.success == self.total
