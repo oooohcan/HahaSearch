@@ -16,7 +16,7 @@ public class WebMvcConfig {
                     //当**Credentials为true时，**Origin不能为星号，需为具体的ip地址【如果接口不带cookie,ip无需设成具体ip】
                     .allowedOrigins("*")
                     //是否允许证书 不再默认开启
-                    .allowCredentials(false)
+                    .allowCredentials(true)
                     //设置允许的方法
                     .allowedMethods("*")
                     //设置允许的请求头格式
