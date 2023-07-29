@@ -9,6 +9,9 @@ import edu.zuel.hahasearch.common.ResultUtils;
 import edu.zuel.hahasearch.exception.BusinessException;
 import edu.zuel.hahasearch.model.domain.Template;
 import edu.zuel.hahasearch.model.domain.User;
+import edu.zuel.hahasearch.model.request.TemplateAddRequest;
+import edu.zuel.hahasearch.model.request.TemplateShareRequest;
+import edu.zuel.hahasearch.model.request.TemplateUpdateRequest;
 import edu.zuel.hahasearch.service.TemplateService;
 import edu.zuel.hahasearch.service.UserService;
 import io.swagger.models.auth.In;
@@ -30,29 +33,35 @@ public class TemplateController {
     private UserService userService;
 
     @PostMapping("/add")
-    public BaseResponse<Long> addTemplate(Integer button, String searchs, String color, String style, Integer isPublic, HttpServletRequest request){
+    public BaseResponse<Long> addTemplate(@RequestBody TemplateAddRequest templateAddRequest, HttpServletRequest request){
+        if(templateAddRequest == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
+        Integer button = templateAddRequest.getButton();
+        String searchs = templateAddRequest.getSearchs();
+        String color = templateAddRequest.getColor();
+        String style = templateAddRequest.getStyle();
+        Integer isPublic = templateAddRequest.getIsPublic();
         long result = templateService.addTemplate(button,searchs,color, style,isPublic,loginUser);
         return ResultUtils.success(result);
     }
 
     @PostMapping("/update")
-    public BaseResponse<Integer> updateTemplate(Integer templateId,Integer button,String color,String style,String searchs, HttpServletRequest request){
-        if(templateId <= 0) throw new BusinessException(ErrorCode.PARAMS_ERROR,"模板ID小于0");
+    public BaseResponse<Integer> updateTemplate(@RequestBody TemplateUpdateRequest templateUpdateRequest, HttpServletRequest request){
+        if(templateUpdateRequest == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         // 建立编辑对象
         Template template = new Template();
-        template.setId(templateId);
-        template.setColor(color);
-        template.setStyle(style);
-        template.setButton(button);
-        template.setSearchs(searchs);
+        template.setId(templateUpdateRequest.getTemplateId());
+        template.setColor(templateUpdateRequest.getColor());
+        template.setStyle(templateUpdateRequest.getStyle());
+        template.setButton(templateUpdateRequest.getButton());
+        template.setSearchs(templateUpdateRequest.getSearchs());
         template.setUserAccount(loginUser.getUserAccount());
         int result = templateService.updateTemplate(template,loginUser);
         return ResultUtils.success(result);
     }
 
-    @PostMapping("/delete")
+    @GetMapping("/delete")
     public BaseResponse<Boolean> deleteTemplate(Integer templateId, HttpServletRequest request){
         User loginUser = userService.getLoginUser(request);
         boolean result = templateService.deleteTemplate(templateId, loginUser);
@@ -71,16 +80,15 @@ public class TemplateController {
     }
 
     @PostMapping("/share")
-    public BaseResponse<Integer> shareTemplate(Integer templateId,Integer isPublic,HttpServletRequest request){
+    public BaseResponse<Integer> shareTemplate(@RequestBody TemplateShareRequest templateShareRequest, HttpServletRequest request){
         // 1、校验
-        if(templateId <= 0) throw new BusinessException(ErrorCode.PARAMS_ERROR,"模板ID小于0");
+        if(templateShareRequest == null) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
         if(!userService.isAdmin(loginUser)) throw new BusinessException(ErrorCode.NO_AUTH);
-        if(!isPublic.equals(0) && !isPublic.equals(1)) throw new BusinessException(ErrorCode.PARAMS_ERROR);
         // 2、修改模板共享权限
         Template template = new Template();
-        template.setId(templateId);
-        template.setIsPublic(isPublic);
+        template.setId(template.getId());
+        template.setIsPublic(template.getIsPublic());
         template.setUserAccount(loginUser.getUserAccount());
         int result = templateService.updateTemplate(template,loginUser);
         return ResultUtils.success(result);

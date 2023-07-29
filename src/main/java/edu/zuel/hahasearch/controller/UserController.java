@@ -8,7 +8,9 @@ import edu.zuel.hahasearch.common.ErrorCode;
 import edu.zuel.hahasearch.common.ResultUtils;
 import edu.zuel.hahasearch.exception.BusinessException;
 import edu.zuel.hahasearch.model.domain.User;
+import edu.zuel.hahasearch.model.request.UserLoginRequest;
 import edu.zuel.hahasearch.model.request.UserRegisterRequest;
+import edu.zuel.hahasearch.model.request.UserUpdateRequest;
 import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +46,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<User> userLogin(String userAccount, String userPassword, HttpServletRequest request){
+    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request){
+        if (userLoginRequest == null) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             return ResultUtils.error(ErrorCode.PARAMS_ERROR);
         }
@@ -116,19 +123,19 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public BaseResponse<Integer> updateUser(Integer userId,String userAccount, String userName, String tenantCode,Integer searchStatus,  String avatarUrl, HttpServletRequest request) {
+    public BaseResponse<Integer> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
         // 校验参数是否为空
-        if (userId <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户ID小于0");
+        if (userUpdateRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 建立用户对象
         User user = new User();
-        user.setId(userId);
-        user.setUserName(userName);
-        user.setUserAccount(userAccount);
-        user.setAvatarUrl(avatarUrl);
-        user.setTenantCode(tenantCode);
-        user.setSearchStatus(searchStatus);
+        user.setId(userUpdateRequest.getUserId());
+        user.setUserName(userUpdateRequest.getUserName());
+        user.setUserAccount(userUpdateRequest.getUserAccount());
+        user.setAvatarUrl(userUpdateRequest.getAvatarUrl());
+        user.setTenantCode(userUpdateRequest.getTenantCode());
+        user.setSearchStatus(userUpdateRequest.getSearchStatus());
         User loginUser = userService.getLoginUser(request);
         int result = userService.updateUser(user, loginUser);
         return ResultUtils.success(result);
@@ -141,7 +148,7 @@ public class UserController {
      * @param request
      * @return
      */
-    @PostMapping("/updatess")
+    @GetMapping("/updateSearch")
     public BaseResponse<Integer> updateSearchStatus(Integer searchStatus, Integer userId,HttpServletRequest request){
         if(StringUtils.isAnyBlank(String.valueOf(searchStatus),String.valueOf(userId))){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -157,7 +164,7 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-    @PostMapping("/delete")
+    @GetMapping("/delete")
     public BaseResponse<Boolean> deleteUser(Integer userId, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
