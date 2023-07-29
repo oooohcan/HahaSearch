@@ -1,4 +1,5 @@
 package edu.zuel.hahasearch.controller;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,11 +12,8 @@ import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
@@ -109,11 +107,19 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
+    public BaseResponse<Integer> updateUser(Integer userId,String userAccount, String userName, String tenantCode,Integer searchStatus,  String avatarUrl, HttpServletRequest request) {
         // 校验参数是否为空
-        if (user == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        if (userId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户ID小于0");
         }
+        // 建立用户对象
+        User user = new User();
+        user.setId(userId);
+        user.setUserName(userName);
+        user.setUserAccount(userAccount);
+        user.setAvatarUrl(avatarUrl);
+        user.setTenantCode(tenantCode);
+        user.setSearchStatus(searchStatus);
         User loginUser = userService.getLoginUser(request);
         int result = userService.updateUser(user, loginUser);
         return ResultUtils.success(result);
@@ -143,14 +149,14 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(long id, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(Integer userId, HttpServletRequest request) {
         if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH);
         }
-        if (id <= 0) {
+        if (userId <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean result = userService.removeById(id);
+        boolean result = userService.removeById(userId);
         return ResultUtils.success(result);
     }
 

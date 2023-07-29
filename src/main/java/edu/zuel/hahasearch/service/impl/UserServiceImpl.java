@@ -165,6 +165,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if(olduser == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户ID错误");
         }
+        //用户名不可重复
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_account",user.getUserAccount());
+        long count = this.count(queryWrapper);
+        if(count > 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账户重复");
+        }
+
         return userMapper.updateById(user);
     }
 
