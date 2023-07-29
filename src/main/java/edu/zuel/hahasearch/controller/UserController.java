@@ -11,11 +11,8 @@ import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
