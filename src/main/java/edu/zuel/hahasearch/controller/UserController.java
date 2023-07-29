@@ -11,6 +11,7 @@ import edu.zuel.hahasearch.model.domain.User;
 import edu.zuel.hahasearch.model.request.UserLoginRequest;
 import edu.zuel.hahasearch.model.request.UserRegisterRequest;
 import edu.zuel.hahasearch.model.request.UserUpdateRequest;
+import edu.zuel.hahasearch.model.request.UserUpdateSearchRequest;
 import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -148,14 +149,19 @@ public class UserController {
      * @param request
      * @return
      */
-    @GetMapping("/updateSearch")
-    public BaseResponse<Integer> updateSearchStatus(Integer searchStatus, Integer userId,HttpServletRequest request){
+    @PostMapping("/updateSearch")
+    public BaseResponse<Integer> updateSearchStatus(@RequestBody UserUpdateSearchRequest userUpdateSearchRequest, HttpServletRequest request){
+        // 1、校验
+        if(userUpdateSearchRequest == null) throw new BusinessException(ErrorCode.NULL_ERROR);
+        Integer searchStatus = userUpdateSearchRequest.getSearchStatus();
+        Integer userId = userUpdateSearchRequest.getUserId();
         if(StringUtils.isAnyBlank(String.valueOf(searchStatus),String.valueOf(userId))){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         if( searchStatus < 0 || searchStatus >2){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"权限码错误");
         }
+        // 2、创建修改对象
         User newUser = new User();
         newUser.setId(userId);
         newUser.setSearchStatus(searchStatus);
