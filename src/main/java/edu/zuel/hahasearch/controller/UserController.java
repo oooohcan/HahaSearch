@@ -8,6 +8,7 @@ import edu.zuel.hahasearch.common.ErrorCode;
 import edu.zuel.hahasearch.common.ResultUtils;
 import edu.zuel.hahasearch.exception.BusinessException;
 import edu.zuel.hahasearch.model.domain.User;
+import edu.zuel.hahasearch.model.request.UserRegisterRequest;
 import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,12 +22,20 @@ import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/user")
 @Slf4j
+@CrossOrigin
 public class UserController {
     @Resource
     private UserService userService;
 
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(String userAccount, String userPassword, String checkPassword, String tenantCode){
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest){
+        if (userRegisterRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
+        String tenantCode = userRegisterRequest.getTenantCode();
         if(StringUtils.isAnyBlank(userAccount,userPassword,checkPassword,tenantCode)){
             return ResultUtils.error(ErrorCode.NULL_ERROR);
         }
