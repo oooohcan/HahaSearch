@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/template")
 @Slf4j
-@CrossOrigin
 public class TemplateController {
     @Resource
     private TemplateService templateService;
