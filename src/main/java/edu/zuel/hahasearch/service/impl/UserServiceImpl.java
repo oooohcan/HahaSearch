@@ -17,6 +17,7 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -165,14 +166,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if(olduser == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户ID错误");
         }
-        //用户名不可重复
+        //修改他人的账户不可重复
+
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_account",user.getUserAccount());
         long count = this.count(queryWrapper);
-        if(count > 0){
+        if(count > 0 && userId != loginUser.getId()){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账户重复");
         }
-
         return userMapper.updateById(user);
     }
 
