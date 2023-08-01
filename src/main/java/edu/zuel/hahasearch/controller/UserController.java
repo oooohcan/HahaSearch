@@ -141,13 +141,6 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-    /**
-     * 用户权限修改，0-搜索所有，1-禁用高级搜索，2-禁用所有搜索
-     * @param searchStatus
-     * @param userId
-     * @param request
-     * @return
-     */
     @PostMapping("/updateSearch")
     public BaseResponse<Integer> updateSearchStatus(@RequestBody UserUpdateSearchRequest userUpdateSearchRequest, HttpServletRequest request){
         // 1、校验
