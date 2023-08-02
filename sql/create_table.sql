@@ -15,30 +15,6 @@ create table user
 )
     comment 'user 用户表';
 
-create table session
-(
-    id          int auto_increment comment 'id 主键'
-        primary key,
-    is_deleted  tinyint  default 0                 not null comment 'is_deleted 是否逻辑删除 0-未删 1-删除',
-    create_time datetime default CURRENT_TIMESTAMP not null comment 'create_time 创建时间',
-    update_time datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment 'update_time 修改时间',
-    uuid        int                                null comment 'uuid 用户id',
-    token       varchar(64)                        null comment 'token 登录token'
-)
-    comment 'session 登录状态表';
-
-create table tenant
-(
-    id          int auto_increment comment 'id 主键'
-        primary key,
-    is_deleted  tinyint  default 0                 not null comment 'is_deleted 是否逻辑删除 0-未删 1-删除',
-    create_time datetime default CURRENT_TIMESTAMP not null comment 'create_time 创建时间',
-    update_time datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment 'update_time 修改时间',
-    tenant_name varchar(32)                        null comment 'tenant_name 租户名',
-    tenant_code varchar(128)                       null comment 'tenant_code 租户码'
-)
-    comment 'tenant 租户表';
-
 create table spider
 (
     id          int auto_increment comment 'id 主键'
