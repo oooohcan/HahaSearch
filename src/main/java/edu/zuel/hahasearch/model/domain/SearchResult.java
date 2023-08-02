@@ -15,5 +15,7 @@ public class SearchResult {
     private String content;
     private String website;
     private String imgUrl;
+    private String type;
+    private String other;
     private Date date;
 }
