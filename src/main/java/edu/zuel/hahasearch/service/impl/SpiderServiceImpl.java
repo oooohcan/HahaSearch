@@ -25,10 +25,10 @@ import java.util.List;
 
 
 /**
- * @author SydZh
- * @description 针对表【spider(spider 爬虫任务表)】的数据库操作Service实现
- * @createDate 2023-07-18 14:22:27
- */
+* @author oooohcan
+* @description 针对表【spider(spider 爬虫任务表)】的数据库操作Service实现
+* @createDate 2023-07-18 14:22:27
+*/
 @Service
 @Slf4j
 public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
