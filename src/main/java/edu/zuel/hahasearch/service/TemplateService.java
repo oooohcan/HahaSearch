@@ -7,7 +7,7 @@ import edu.zuel.hahasearch.model.domain.User;
 import java.util.List;
 
 /**
-* @author SydZh
+* @author oooohcan
 * @description 针对表【template(template 模板表)】的数据库操作Service
 * @createDate 2023-07-18 15:31:50
 */
