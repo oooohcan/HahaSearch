@@ -99,7 +99,7 @@ class HttpTask(BasicTask):
 
         def rand_header():
             agents = BasicTask.get_headers()['user_agent']
-            print('rand_header')
+            # print('rand_header')
             return {'user_agent': agents[randint(0, len(agents) - 1)]}
 
         self.target = target
@@ -117,7 +117,8 @@ class HttpTask(BasicTask):
             'success': self.success,
             'fail': self.fail,
             'rate': round(float(self.success) / float(self.total), 3) if self.total > 0 else 0,
-            'type': 'http'
+            'type': 'http',
+            'url': self.target
         }
 
     def is_finished(self) -> bool:

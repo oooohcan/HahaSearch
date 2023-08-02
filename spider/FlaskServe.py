@@ -13,13 +13,13 @@ def create_http_serve(js: dict):
             return response_wrong('缺少参数')
 
     code = js['code']
-    index = js['index']
+    index = int(js['index'])
     name = js['name']
     target = js['target']
     deep = 0
     headers = dict()
     if 'deep' in js:
-        deep = js['deep']
+        deep = int(js['deep'])
     if 'headers' in js:
         headers = js['headers']
 
@@ -42,7 +42,7 @@ def pause_task_serve(js: dict):
     if 'code' not in js or 'index' not in js:
         return response_wrong('缺少参数')
 
-    code, index = js['code'], js['index']
+    code, index = js['code'], int(js['index'])
     if not tenantPool.check_tenant(code):
         return response_wrong('租户不存在')
     try:
@@ -56,7 +56,7 @@ def resume_task_serve(js: dict):
     if 'code' not in js or 'index' not in js:
         return response_wrong('缺少参数')
 
-    code, index = js['code'], js['index']
+    code, index = js['code'], int(js['index'])
     try:
         tenantPool.resume_task(code, index)
         return response_success('任务已恢复')
@@ -68,7 +68,7 @@ def cancel_task_serve(js: dict):
     if 'code' not in js or 'index' not in js:
         return response_wrong('缺少参数')
 
-    code, index = js['code'], js['index']
+    code, index = js['code'], int(js['index'])
     try:
         tenantPool.cancel_task(code, index)
         return response_success('任务已删除')
@@ -91,8 +91,9 @@ def get_running_tasks_serve(js: dict):
         return response_wrong('缺少参数')
     code = js['code']
     try:
-        return tenantPool.get_running_tasks(code)
+        return response_success(tenantPool.get_running_tasks(code))
     except Exception as e:
+        print(e)
         return response_wrong(str(e))
 
 
@@ -101,8 +102,9 @@ def get_waiting_tasks_serve(js: dict):
         return response_wrong('缺少参数')
     code = js['code']
     try:
-        return tenantPool.get_waiting_tasks(code)
+        return response_success(tenantPool.get_waiting_tasks(code))
     except Exception as e:
+        print(e)
         return response_wrong(str(e))
 
 

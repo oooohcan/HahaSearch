@@ -81,3 +81,4 @@ if __name__ == '__main__':
                   max_instances=4)
     sched.start()
     app.run(debug=True, host="0.0.0.0", port=Config.MY_APP_PORT)
+    # app.run(port=Config.MY_APP_PORT)
