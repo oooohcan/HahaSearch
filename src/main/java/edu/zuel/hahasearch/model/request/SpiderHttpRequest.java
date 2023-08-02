@@ -5,7 +5,10 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class SpiderRunningRequest implements Serializable {
+public class SpiderHttpRequest implements Serializable {
     private static final long serialVersionUID = 1227841801177214731L;
-    private String code;
+    private String target;
+    private String name;
+    private String index;
+    private String deep;
 }
