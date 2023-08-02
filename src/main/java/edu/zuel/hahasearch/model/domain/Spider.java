@@ -4,13 +4,15 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 
 /**
  * spider 爬虫任务表
+ *
  * @TableName spider
  */
-@TableName(value ="spider")
+@TableName(value = "spider")
 @Data
 public class Spider implements Serializable {
     /**
@@ -42,4 +44,16 @@ public class Spider implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public Spider() {
+        this.isDeleted = 0;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
+
+    public Spider(String tenantCode) {
+        this();
+        this.tenantCode = tenantCode;
+    }
+
 }

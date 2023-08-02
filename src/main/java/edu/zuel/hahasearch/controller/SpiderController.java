@@ -4,6 +4,7 @@ import edu.zuel.hahasearch.common.BaseResponse;
 import edu.zuel.hahasearch.common.ErrorCode;
 import edu.zuel.hahasearch.common.ResultUtils;
 import edu.zuel.hahasearch.exception.BusinessException;
+import edu.zuel.hahasearch.model.domain.Task;
 import edu.zuel.hahasearch.model.domain.User;
 import edu.zuel.hahasearch.model.request.*;
 import edu.zuel.hahasearch.service.SpiderService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
 
 import static edu.zuel.hahasearch.common.ErrorCode.PARAMS_ERROR;
 import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
@@ -38,17 +41,16 @@ public class SpiderController {
         }
         String target = spiderHttpRequest.getTarget();
         String name = spiderHttpRequest.getName();
-        String index = spiderHttpRequest.getIndex();
         String code = currentUser.getTenantCode();
         String deep = spiderHttpRequest.getDeep();
-        if (target == null || name == null || index == null || code == null) {
+        if (target == null || name == null || code == null) {
             return ResultUtils.error(PARAMS_ERROR);
         }
         try {
-            String msg = spiderService.httpSpider(target, name, index, code, deep);
+            String msg = spiderService.httpSpider(target, name, code, deep);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
@@ -72,7 +74,7 @@ public class SpiderController {
             String msg = spiderService.pauseTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
@@ -95,7 +97,7 @@ public class SpiderController {
             String msg = spiderService.cancelTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
@@ -118,12 +120,12 @@ public class SpiderController {
             String msg = spiderService.resumeTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
     @PostMapping("get_tasks")
-    public BaseResponse<String> getTasks(HttpServletRequest request) {
+    public BaseResponse<List<Task>> getTasks(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
@@ -131,15 +133,14 @@ public class SpiderController {
         }
         String code = currentUser.getTenantCode();
         try {
-            String msg = spiderService.getTasks(code);
-            return ResultUtils.success(msg);
+            return ResultUtils.success(spiderService.getTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
     @PostMapping("get_running_tasks")
-    public BaseResponse<String> getRunningTasks(HttpServletRequest request) {
+    public BaseResponse<List<Task>> getRunningTasks(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
@@ -147,15 +148,14 @@ public class SpiderController {
         }
         String code = currentUser.getTenantCode();
         try {
-            String msg = spiderService.getRunningTasks(code);
-            return ResultUtils.success(msg);
+            return ResultUtils.success(spiderService.getRunningTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 
     @PostMapping("get_waiting_tasks")
-    public BaseResponse<String> getWaitingTasks(HttpServletRequest request) {
+    public BaseResponse<List<Task>> getWaitingTasks(HttpServletRequest request) {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
@@ -163,10 +163,9 @@ public class SpiderController {
         }
         String code = currentUser.getTenantCode();
         try {
-            String msg = spiderService.getWaitingTasks(code);
-            return ResultUtils.success(msg);
+            return ResultUtils.success(spiderService.getWaitingTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SYSTEM_ERROR);
+            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
         }
     }
 

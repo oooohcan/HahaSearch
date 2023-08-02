@@ -2,6 +2,7 @@ package edu.zuel.hahasearch.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import edu.zuel.hahasearch.model.domain.Spider;
+import edu.zuel.hahasearch.model.domain.Task;
 import edu.zuel.hahasearch.service.SpiderService;
 import edu.zuel.hahasearch.mapper.SpiderMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -81,49 +85,119 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
     }
 
     @Override
-    public String httpSpider(String target, String name, String index, String code, String deep) {
+    public String httpSpider(String target, String name, String code, String deep) {
         JSONObject jsonObject = new JSONObject();
+        Spider spider = new Spider(code);
+        spiderMapper.insert(spider);
+        int index = spider.getId();
         try {
             jsonObject.put("target", target);
             jsonObject.put("name", name);
             jsonObject.put("index", index);
             jsonObject.put("code", code);
-            jsonObject.put("deep", deep);
+            if (deep != null && !deep.isEmpty()) {
+                jsonObject.put("deep", deep);
+            }
+            JSONObject response = postRequest(httpUrl, jsonObject);
+            int responseCode = response.getInt("code");
+            if (responseCode != 0) {
+                throw new RuntimeException(response.getString("msg"));
+            }
+            return response.getString("msg");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        JSONObject response = postRequest(httpUrl, jsonObject);
-        return response.toString();
     }
 
     @Override
     public String pauseTask(String code, String index) {
-        return null;
+        return getResult(code, index, pauseUrl);
     }
 
     @Override
     public String cancelTask(String code, String index) {
-        return null;
+        return getResult(code, index, cancelUrl);
     }
 
     @Override
     public String resumeTask(String code, String index) {
-        return null;
+        return getResult(code, index, resumeUrl);
     }
 
     @Override
-    public String getTasks(String code) {
-        return null;
+    public List<Task> getTasks(String code) {
+        return getListTasks(code, getTasksUrl);
     }
 
     @Override
-    public String getRunningTasks(String code) {
-        return null;
+    public List<Task> getRunningTasks(String code) {
+        return getListTasks(code, getRunningTasksUrl);
     }
 
     @Override
-    public String getWaitingTasks(String code) {
-        return null;
+    public List<Task> getWaitingTasks(String code) {
+        return getListTasks(code, getWaitingTasksUrl);
+    }
+
+    @NotNull
+    private List<Task> getListTasks(String code, String getRunningTasksUrl) {
+        JSONObject msgObject = getResult(code, getRunningTasksUrl);
+        List<Task> tasks = new ArrayList<>();
+        if (msgObject == null || msgObject.length() == 0) {
+            return tasks;
+        }
+        try {
+            Iterator keys = msgObject.keys();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                JSONObject taskObject = msgObject.getJSONObject(key);
+                Task task = new Task();
+                task.setRate(taskObject.getDouble("rate"));
+                task.setFail(taskObject.getInt("fail"));
+                task.setIndex(taskObject.getInt("index"));
+                task.setName(taskObject.getString("name"));
+                task.setSuccess(taskObject.getInt("success"));
+                task.setUrl(taskObject.getString("url"));
+                task.setProperty(taskObject.getString("property"));
+                task.setTotal(taskObject.getInt("total"));
+                task.setType(taskObject.getString("type"));
+                tasks.add(task);
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return tasks;
+    }
+
+    private String getResult(String code, String index, String resumeUrl) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("code", code);
+            jsonObject.put("index", index);
+            JSONObject response = postRequest(resumeUrl, jsonObject);
+            int responseCode = response.getInt("code");
+            if (responseCode != 0) {
+                throw new RuntimeException(response.getString("msg"));
+            }
+            return response.getString("msg");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JSONObject getResult(String code, String getWaitingTasksUrl) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("code", code);
+            JSONObject response = postRequest(getWaitingTasksUrl, jsonObject);
+            int responseCode = response.getInt("code");
+            if (responseCode != 0) {
+                throw new RuntimeException(response.getString("msg"));
+            }
+            return response.getJSONObject("msg");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
