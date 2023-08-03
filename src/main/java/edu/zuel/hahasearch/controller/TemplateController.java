@@ -85,8 +85,8 @@ public class TemplateController {
         if(!userService.isAdmin(loginUser)) throw new BusinessException(ErrorCode.NO_AUTH);
         // 2、修改模板共享权限
         Template template = new Template();
-        template.setId(template.getId());
-        template.setIsPublic(template.getIsPublic());
+        template.setId(templateShareRequest.getTemplateId());
+        template.setIsPublic(templateShareRequest.getIsPublic());
         template.setUserAccount(loginUser.getUserAccount());
         int result = templateService.updateTemplate(template,loginUser);
         return ResultUtils.success(result);
