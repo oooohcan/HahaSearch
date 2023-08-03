@@ -14,8 +14,8 @@ public class HahaSearchApplication {
         try{
             String currentDir = System.getProperty("user.dir");
             String batchFile = currentDir + "\\support.bat";
-            Runtime.getRuntime().exec(batchFile);
-        } catch (IOException e) {
+//            Runtime.getRuntime().exec(batchFile);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         SpringApplication.run(HahaSearchApplication.class, args);
