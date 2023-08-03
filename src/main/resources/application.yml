@@ -6,9 +6,9 @@ spring:
 #  记得更改数据库信息
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.3.82:3306/farlight
-    username: farlight_admin
-    password: '2023_fARlIGHT_07'
+    url: jdbc:mysql://localhost:3306/hahasearch
+    username: root
+    password: '0789'
   #session失效时间
   session:
     timeout: 86400
