@@ -4,6 +4,7 @@ import io.github.classgraph.json.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -14,6 +15,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Document(indexName = "esresult",createIndex = true)
 public class ESResult {
     @Id
@@ -31,6 +33,6 @@ public class ESResult {
     private String type;    //文档类型
     @Field(type = FieldType.Text)
     private String other;   //其他内容
-    @Field(type = FieldType.Date,format = DateFormat.basic_date_time)
+    @Field(type = FieldType.Date,format = DateFormat.date_time)
     private Date date;      //发布日期
 }
