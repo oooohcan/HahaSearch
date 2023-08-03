@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ESResultDao extends ElasticsearchRepository<ESResult,String> {
+public interface ESResultDao extends ElasticsearchRepository<ESResult,Integer> {
     List<ESResult> findESResultByTitle(String title);
+    List<ESResult> searchByTitle(String title);
+    List<ESResult> searchByContent(String content);
     List<ESResult> findESResultByTitleOrContent(String title,String content);
 }
