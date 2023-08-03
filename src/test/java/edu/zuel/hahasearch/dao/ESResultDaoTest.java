@@ -35,6 +35,8 @@ public class ESResultDaoTest {
         System.out.println("创建索引");
     }
 
+
+//    参数出错
 //    @Test
 //    public void deleteIndex(){
 //        elasticsearchRestTemplate.delete(ESResult.class);

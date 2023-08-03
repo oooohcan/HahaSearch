@@ -84,7 +84,9 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template>
         }
         // isPublic参数限制为 0或1
         Integer isPublic = template.getIsPublic();
-        if(!isPublic.equals(0) && !isPublic.equals(1)) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        if(isPublic != null){
+            if(!isPublic.equals(0) && !isPublic.equals(1)) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
         // 查询模板是否存在
         Template oldTemplate = templateMapper.selectById(templateId);
         if(oldTemplate == null) throw new BusinessException(ErrorCode.PARAMS_ERROR,"模板ID错误");
