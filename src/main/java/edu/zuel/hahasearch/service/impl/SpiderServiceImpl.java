@@ -85,7 +85,7 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
     }
 
     @Override
-    public String httpSpider(String target, String name, String code, String deep) {
+    public String httpSpider(String target, String name, String code, int deep) {
         JSONObject jsonObject = new JSONObject();
         Spider spider = new Spider(code);
         spiderMapper.insert(spider);
@@ -95,7 +95,7 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
             jsonObject.put("name", name);
             jsonObject.put("index", index);
             jsonObject.put("code", code);
-            if (deep != null && !deep.isEmpty()) {
+            if (deep > 0) {
                 jsonObject.put("deep", deep);
             }
             JSONObject response = postRequest(httpUrl, jsonObject);
@@ -110,17 +110,17 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
     }
 
     @Override
-    public String pauseTask(String code, String index) {
+    public String pauseTask(String code, int index) {
         return getResult(code, index, pauseUrl);
     }
 
     @Override
-    public String cancelTask(String code, String index) {
+    public String cancelTask(String code, int index) {
         return getResult(code, index, cancelUrl);
     }
 
     @Override
-    public String resumeTask(String code, String index) {
+    public String resumeTask(String code, int index) {
         return getResult(code, index, resumeUrl);
     }
 
@@ -169,7 +169,7 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
         return tasks;
     }
 
-    private String getResult(String code, String index, String resumeUrl) {
+    private String getResult(String code, int index, String resumeUrl) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("code", code);

@@ -42,7 +42,7 @@ public class SpiderController {
         String target = spiderHttpRequest.getTarget();
         String name = spiderHttpRequest.getName();
         String code = currentUser.getTenantCode();
-        String deep = spiderHttpRequest.getDeep();
+        int deep = spiderHttpRequest.getDeep();
         if (target == null || name == null || code == null) {
             return ResultUtils.error(PARAMS_ERROR);
         }
@@ -66,8 +66,8 @@ public class SpiderController {
             return ResultUtils.error(PARAMS_ERROR);
         }
         String code = currentUser.getTenantCode();
-        String index = spiderPauseRequest.getIndex();
-        if (code == null || index == null) {
+        int index = spiderPauseRequest.getIndex();
+        if (code == null) {
             return ResultUtils.error(PARAMS_ERROR);
         }
         try {
@@ -89,8 +89,8 @@ public class SpiderController {
             return ResultUtils.error(PARAMS_ERROR);
         }
         String code = currentUser.getTenantCode();
-        String index = spiderCancelRequest.getIndex();
-        if (code == null || index == null) {
+        int index = spiderCancelRequest.getIndex();
+        if (code == null) {
             return ResultUtils.error(PARAMS_ERROR);
         }
         try {
@@ -112,8 +112,8 @@ public class SpiderController {
             return ResultUtils.error(PARAMS_ERROR);
         }
         String code = currentUser.getTenantCode();
-        String index = spiderResumeRequest.getIndex();
-        if (code == null || index == null) {
+        int index = spiderResumeRequest.getIndex();
+        if (code == null) {
             return ResultUtils.error(PARAMS_ERROR);
         }
         try {

@@ -12,13 +12,13 @@ import java.util.List;
 * @createDate 2023-07-18 14:22:27
 */
 public interface SpiderService extends IService<Spider> {
-    String httpSpider(String target, String name, String code, String deep);
+    String httpSpider(String target, String name, String code, int deep);
 
-    String pauseTask(String code, String index);
+    String pauseTask(String code, int index);
 
-    String cancelTask(String code, String index);
+    String cancelTask(String code, int index);
 
-    String resumeTask(String code, String index);
+    String resumeTask(String code, int index);
 
     List<Task> getTasks(String code);
 
