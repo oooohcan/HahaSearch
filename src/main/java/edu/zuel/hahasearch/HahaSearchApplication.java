@@ -13,7 +13,7 @@ public class HahaSearchApplication {
     public static void main(String[] args) {
         try{
             String currentDir = System.getProperty("user.dir");
-            String batchFile = currentDir + "\\spider.bat";
+            String batchFile = currentDir + "\\support.bat";
             Runtime.getRuntime().exec(batchFile);
         } catch (IOException e) {
             throw new RuntimeException(e);

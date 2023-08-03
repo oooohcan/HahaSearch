@@ -34,3 +34,10 @@ build/
 
 ### DataBase ###
 database.yml
+
+### elasticsearch ###
+/elasticsearch
+
+### Gradle ###
+*.7z
+elasticsearch-7.17.3.zip
