@@ -33,7 +33,7 @@ public class ESResultController {
         List<ESResult> esResults = new ArrayList<>();
         for(ESAddOneRequest es : esList){
             ESResult esResult = new ESResult();
-            BeanUtils.copyProperties(esResult,es);
+            BeanUtils.copyProperties(es,esResult);
             esResults.add(esResult);
         }
         int save = esResultService.saveBatchESResult(esResults);
@@ -43,7 +43,7 @@ public class ESResultController {
     @PostMapping("/add-one")
     public BaseResponse<Integer> addOneESResult(@RequestBody ESAddOneRequest esAddOneRequest){
         ESResult esResult = new ESResult();
-        BeanUtils.copyProperties(esResult, esAddOneRequest);
+        BeanUtils.copyProperties(esAddOneRequest,esResult);
         int save = esResultService.saveESResult(esResult);
         return ResultUtils.success(save);
     }
