@@ -35,7 +35,31 @@ def create_http_serve(js: dict):
 
 
 def create_ftp_serve(js: dict):
-    pass
+    params = ['code', 'index', 'name', 'target', 'visit_dir', 'uname', 'upwd']
+    for param in params:
+        if param not in js:
+            return response_wrong('缺少参数')
+    code = js['code']
+    index = int(js['index'])
+    name = js['name']
+    target = js['target']
+    visit_dir = js['visit_dir']
+    uname = js['uname']
+    upwd = js['upwd']
+    deep = 0
+    if 'deep' in js:
+        deep = int(js['deep'])
+
+    save_path = pathlib.Path(FILE_PATH) / str(code) / str(index)
+    if not tenantPool.check_tenant(code):
+        tenantPool.add_tenant(code)
+    try:
+        task = FtpTask(index, name, target, uname,
+                       upwd, visit_dir, save_path, deep)
+        tenantPool.add_task(code, task)
+        return response_success('任务已添加')
+    except Exception as e:
+        return response_wrong(str(e))
 
 
 def pause_task_serve(js: dict):
