@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static edu.zuel.hahasearch.common.ErrorCode.PARAMS_ERROR;
+import static edu.zuel.hahasearch.common.ErrorCode.SPIDER_ERROR;
 import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
@@ -50,7 +51,35 @@ public class SpiderController {
             String msg = spiderService.httpSpider(target, name, code, deep);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
+        }
+    }
+
+    @PostMapping("/ftp")
+    public BaseResponse<String> ftpSpider(@RequestBody SpiderFtpRequest spiderFtpRequest, HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
+        }
+        if (spiderFtpRequest == null) {
+            return ResultUtils.error(PARAMS_ERROR);
+        }
+        String target = spiderFtpRequest.getTarget();
+        String name = spiderFtpRequest.getName();
+        String code = currentUser.getTenantCode();
+        String visitDir = spiderFtpRequest.getVisitDir();
+        String uname = spiderFtpRequest.getUname();
+        String upwd = spiderFtpRequest.getUpwd();
+        int deep = spiderFtpRequest.getDeep();
+        if (target == null || name == null || code == null) {
+            return ResultUtils.error(PARAMS_ERROR);
+        }
+        try {
+            String msg = spiderService.ftpSpider(target, name, code, visitDir, uname, upwd, deep);
+            return ResultUtils.success(msg);
+        } catch (Exception e) {
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -74,7 +103,7 @@ public class SpiderController {
             String msg = spiderService.pauseTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -97,7 +126,7 @@ public class SpiderController {
             String msg = spiderService.cancelTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -120,7 +149,7 @@ public class SpiderController {
             String msg = spiderService.resumeTask(code, index);
             return ResultUtils.success(msg);
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -135,7 +164,7 @@ public class SpiderController {
         try {
             return ResultUtils.success(spiderService.getTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -150,7 +179,7 @@ public class SpiderController {
         try {
             return ResultUtils.success(spiderService.getRunningTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 
@@ -165,7 +194,7 @@ public class SpiderController {
         try {
             return ResultUtils.success(spiderService.getWaitingTasks(code));
         } catch (Exception e) {
-            return ResultUtils.error(ErrorCode.SPIDER_ERROR);
+            return ResultUtils.error(SPIDER_ERROR, e.getMessage(), e.toString());
         }
     }
 

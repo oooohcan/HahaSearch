@@ -25,10 +25,10 @@ import java.util.List;
 
 
 /**
-* @author oooohcan
-* @description 针对表【spider(spider 爬虫任务表)】的数据库操作Service实现
-* @createDate 2023-07-18 14:22:27
-*/
+ * @author oooohcan
+ * @description 针对表【spider(spider 爬虫任务表)】的数据库操作Service实现
+ * @createDate 2023-07-18 14:22:27
+ */
 @Service
 @Slf4j
 public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
@@ -36,6 +36,7 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
 
     private final String spiderUrl = "http://localhost:11451";
     private final String httpUrl = spiderUrl + "/create_http";
+    private final String ftpUrl = spiderUrl + "/create_ftp";
     private final String pauseUrl = spiderUrl + "/pause_task";
     private final String cancelUrl = spiderUrl + "/cancel_task";
     private final String resumeUrl = spiderUrl + "/resume_task";
@@ -99,6 +100,33 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
                 jsonObject.put("deep", deep);
             }
             JSONObject response = postRequest(httpUrl, jsonObject);
+            int responseCode = response.getInt("code");
+            if (responseCode != 0) {
+                throw new RuntimeException(response.getString("msg"));
+            }
+            return response.getString("msg");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String ftpSpider(String target, String name, String code, String visitDir, String uname, String upwd, int deep) {
+        JSONObject jsonObject = new JSONObject();
+        Spider spider = new Spider(code);
+        spiderMapper.insert(spider);
+        int index = spider.getId();
+        try {
+            jsonObject.put("target", target);
+            jsonObject.put("name", name);
+            jsonObject.put("index", index);
+            jsonObject.put("code", code);
+            jsonObject.put("visit_dir", visitDir);
+            jsonObject.put("uname", uname);
+            jsonObject.put("upwd", upwd);
+            if (deep > 0) {
+                jsonObject.put("deep", deep);
+            }
+            JSONObject response = postRequest(ftpUrl, jsonObject);
             int responseCode = response.getInt("code");
             if (responseCode != 0) {
                 throw new RuntimeException(response.getString("msg"));

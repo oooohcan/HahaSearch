@@ -4,6 +4,7 @@ import requests
 import threading
 from time import sleep
 from random import randint
+from ftplib import FTP
 
 from ServeTools import *
 
@@ -52,7 +53,7 @@ class BasicTask:
                 pass
 
     def is_finished(self) -> bool:
-        pass
+        return self.total > 0 and self.total == self.success + self.fail
 
     def get_headers() -> dict:
         user_agents = [
@@ -121,9 +122,6 @@ class HttpTask(BasicTask):
             'url': self.target
         }
 
-    def is_finished(self) -> bool:
-        return self.fail + self.success == self.total
-
     def get_html(self, url: str) -> str:
         '''
         爬取指定url的源代码,返回源代码字符串
@@ -188,7 +186,7 @@ class HttpTask(BasicTask):
                 continue
 
             temp = ''
-            if level < self.deep:
+            if level < self.deep:  # 广度遍历，当且仅当层数小于deep时才会继续遍历
                 links = find_links(html_text)
                 for link in links:
                     link = str(link)
@@ -204,8 +202,89 @@ class HttpTask(BasicTask):
 
             sleep(randint(1, 3))
 
-        # print(self.get_progress())
-
 
 class FtpTask(BasicTask):
-    pass
+    def __init__(self, index: int, name: str, target: str, uname: str, upwd: str, visit_dir: str, save_path: str, deep: int = 0):
+        super().__init__(index, name)
+
+        if len(str(target)) == 0:
+            raise ValueError('url is empty')
+        if len(str(save_path)) == 0:
+            raise ValueError('save_path is empty')
+        if len(name) == 0 or not check_file_name(name):
+            raise ValueError('save_name is invalid')
+        if len(str(visit_dir)) == 0 or visit_dir[0] != '/':
+            raise ValueError('visit_dir is invalid')
+        if deep < 0 or deep > 5:
+            raise ValueError('deep is invalid')
+
+        self.target = str(target)
+        self.uname = str(uname)
+        self.upwd = str(upwd)
+        self.visit_dir = str(visit_dir)
+        self.save_path = str(save_path)
+        self.save_name = str(name)
+        self.deep = int(deep)
+
+    def get_info(self) -> dict:
+        return {
+            'index': self.index,
+            'name': self.name,
+            'property': 'paused' if self.paused else 'waiting' if self.waiting else 'running' if not self.is_finished() else 'finished',
+            'total': self.total,
+            'success': self.success,
+            'fail': self.fail,
+            'rate': round(float(self.success) / float(self.total), 3) if self.total > 0 else 0,
+            'type': 'ftp',
+            'url': self.target
+        }
+
+    def start_task(self):
+        # 新建spider_ftp线程
+        t = threading.Thread(target=self.spider_ftp)
+        t.start()
+
+    def spider_ftp(self):
+        ftp = FTP(self.target)
+        ftp.login(self.uname, self.upwd)
+
+        q = queue.Queue()
+        q.put(self.visit_dir)
+        self.total = 1
+        level = 0
+        last = self.visit_dir
+
+        while not q.empty():
+            with self.condition:
+                if self.cancelled:
+                    break
+                while self.waiting:
+                    self.condition.wait()
+                while self.paused:
+                    self.condition.wait()
+
+            dir = q.get()
+            temp = ''
+            try:
+                ftp.cwd(dir)
+            except:
+                self.fail += 1
+                continue
+
+            files = ftp.nlst()
+            for file in files:
+                file_path = dir + '/' + file
+                try:
+                    ftp.cwd(file_path)
+                    if level < self.deep:  # 广度遍历，当且仅当层数小于deep时才会继续遍历
+                        q.put(file_path)
+                        self.total += 1
+                        temp = file_path
+                    ftp.cwd('..')
+                except:
+                    print(f"访问文件:{self.target+file_path}")
+
+            if dir == last:
+                level += 1
+                last = temp
+            self.success += 1

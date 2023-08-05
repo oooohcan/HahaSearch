@@ -1,6 +1,6 @@
 import json
 from flask import request, Flask
-from flask_cors import CORS
+# from flask_cors import CORS
 
 import Config
 from ScheFunc import sched, check_pool
@@ -8,7 +8,7 @@ from FlaskServe import *
 
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app, supports_credentials=True)
+# CORS(app, supports_credentials=True)
 
 
 @app.route('/create_http', methods=['GET', 'POST'])
