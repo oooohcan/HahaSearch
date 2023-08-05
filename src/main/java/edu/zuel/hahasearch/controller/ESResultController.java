@@ -121,7 +121,7 @@ public class ESResultController {
     }
 
     @GetMapping("search-tenant")
-    public BaseResponse<Page<ESResult>> searchBytenantCode(String keyword,Integer page,Integer size, HttpServletRequest request){
+    public BaseResponse<Page<ESResult>> searchByTenantCode(String keyword,Integer page,Integer size, HttpServletRequest request){
         int searchStatus = userService.getSearchStatus(request);
         if (searchStatus != DEFAULT_STATUS) throw new BusinessException(ErrorCode.NO_AUTH,"无搜索权限");
         Page<ESResult> esResults = esResultRepository.searchESResultByTenantCodeLike(keyword, PageRequest.of(page-1, size));
