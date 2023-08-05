@@ -2,14 +2,20 @@ package edu.zuel.hahasearch.dao;
 import java.util.ArrayList;
 import java.util.Date;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import edu.zuel.hahasearch.model.domain.ESResult;
 import edu.zuel.hahasearch.service.ESResultService;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Query;
 
 import java.util.List;
 
@@ -22,7 +28,7 @@ public class ESResultTest {
     private ESResultService esResultService;
 
     @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private ElasticsearchOperations esOperations;
 
     @Test
     public void createIndex(){
@@ -104,7 +110,7 @@ public class ESResultTest {
      */
     @Test
     public void findByX(){
-        Page<ESResult> esResultList = esResultRepository.findESResultByTitleOrContent("h","a", PageRequest.of(0,10));
+        Page<ESResult> esResultList = esResultRepository.findESResultByTitleOrContent("hhh","aaa", PageRequest.of(0,10));
         System.out.println(esResultList.getTotalElements());
         esResultList.forEach(System.out::println);
     }
@@ -114,7 +120,7 @@ public class ESResultTest {
      */
     @Test
     public void searchByX(){
-        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleOrContent("h","a", PageRequest.of(0,10));
+        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleOrContent("hhh","aaa", PageRequest.of(0,10));
         esResultList.forEach(System.out::println);
     }
 
@@ -123,9 +129,16 @@ public class ESResultTest {
      */
     @Test
     public void searchLikeX(){
-        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleLikeOrContentLike("h","a", PageRequest.of(0,10));
+        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleLikeOrContentLike("hhh","aaa", PageRequest.of(0,10));
         esResultList.forEach(System.out::println);
     }
-
+//    这个方式跑不通
+//    @Test
+//    public void searchMatchX(){
+//        String keyword = "hh";
+//        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("content",keyword);
+//        SearchHits<ESResult> search = esOperations.search((Query) matchQueryBuilder,ESResult.class);
+//        search.forEach(System.out::println);
+//    }
 
 }

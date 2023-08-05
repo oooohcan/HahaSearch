@@ -8,8 +8,6 @@ import org.springframework.data.elasticsearch.annotations.HighlightField;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface ESResultRepository extends ElasticsearchRepository<ESResult,String> {
     ESResult findESResultById(String id);

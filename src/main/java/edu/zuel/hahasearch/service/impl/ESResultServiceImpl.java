@@ -21,7 +21,7 @@ public class ESResultServiceImpl implements ESResultService {
     @Autowired
     private ESResultRepository esResultRepository;
     @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private ElasticsearchOperations esOperations;
 
     @Override
     public int saveBatchESResult(List<ESResult> esResults) {
@@ -47,7 +47,6 @@ public class ESResultServiceImpl implements ESResultService {
 
         return 1;
     }
-
 
     @Override
     public boolean deleteESResult(String id) {
