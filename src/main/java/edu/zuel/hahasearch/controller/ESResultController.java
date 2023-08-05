@@ -10,6 +10,7 @@ import edu.zuel.hahasearch.model.domain.ESResult;
 import edu.zuel.hahasearch.model.request.ESAddBatchRequest;
 import edu.zuel.hahasearch.model.request.ESAddOneRequest;
 import edu.zuel.hahasearch.service.ESResultService;
+import edu.zuel.hahasearch.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,9 @@ public class ESResultController {
     private ESResultService esResultService;
     @Autowired
     private ESResultRepository esResultRepository;
+    @Resource
+    private UserService userService;
+
 
     @PostMapping("/add-batch")
     public BaseResponse<Integer> addBatchESResult(@RequestBody ESAddBatchRequest esAddBatchRequest){
@@ -56,6 +61,7 @@ public class ESResultController {
 
     @GetMapping("/delete")
     public BaseResponse<Boolean> deleteESResult(String id, HttpServletRequest request){
+        if (!userService.isAdmin(request)) throw new BusinessException(ErrorCode.NO_AUTH);
         if(StringUtils.isBlank(id)) throw new BusinessException(ErrorCode.NULL_ERROR);
         boolean result = esResultService.deleteESResult(id);
         return ResultUtils.success(result);
@@ -63,6 +69,7 @@ public class ESResultController {
 
     @PostMapping("/update")
     public BaseResponse<Integer> updateESResult(@RequestBody ESResult esResult, HttpServletRequest request){
+        if (!userService.isAdmin(request)) throw new BusinessException(ErrorCode.NO_AUTH);
         // 1、取值校验
         String id = esResult.getId();
         String title = esResult.getTitle();
@@ -82,6 +89,7 @@ public class ESResultController {
 
     @GetMapping("/find")
     public BaseResponse<ESResult> findById(String id, HttpServletRequest request){
+        if (!userService.isAdmin(request)) throw new BusinessException(ErrorCode.NO_AUTH);
         ESResult esResult = esResultRepository.findESResultById(id);
         return ResultUtils.success(esResult);
     }
