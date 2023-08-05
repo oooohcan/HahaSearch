@@ -132,7 +132,7 @@ public class ESResultTest {
      */
     @Test
     public void searchLikeX(){
-        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleLikeOrContentLike("hhh","aaa", PageRequest.of(0,10));
+        Page<ESResult> esResultList = esResultRepository.searchESResultByTenantCodeAndTitleLikeOrContentLike("zuel","hhh","aaa", PageRequest.of(0,10));
         esResultList.forEach(System.out::println);
     }
 //    这个方式跑不通

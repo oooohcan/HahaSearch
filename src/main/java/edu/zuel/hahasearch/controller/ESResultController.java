@@ -7,6 +7,7 @@ import edu.zuel.hahasearch.common.ResultUtils;
 import edu.zuel.hahasearch.dao.ESResultRepository;
 import edu.zuel.hahasearch.exception.BusinessException;
 import edu.zuel.hahasearch.model.domain.ESResult;
+import edu.zuel.hahasearch.model.domain.User;
 import edu.zuel.hahasearch.model.request.ESAddBatchRequest;
 import edu.zuel.hahasearch.model.request.ESAddOneRequest;
 import edu.zuel.hahasearch.service.ESResultService;
@@ -92,39 +93,53 @@ public class ESResultController {
     @GetMapping("/find")
     public BaseResponse<ESResult> findById(String id, HttpServletRequest request){
         if (!userService.isAdmin(request)) throw new BusinessException(ErrorCode.NO_AUTH);
+        //根据文档id搜索
         ESResult esResult = esResultRepository.findESResultById(id);
         return ResultUtils.success(esResult);
     }
 
+    @GetMapping("find-tenant")
+    public BaseResponse<Page<ESResult>> findByTenantCode(String keyword,Integer page,Integer size, HttpServletRequest request){
+        if (!userService.isAdmin(request)) throw new BusinessException(ErrorCode.NO_AUTH);
+        //根据租户码搜索
+        Page<ESResult> esResults = esResultRepository.findESResultByTenantCodeLike(keyword, PageRequest.of(page-1, size));
+        return ResultUtils.success(esResults);
+    }
+
     @GetMapping("search")
     public BaseResponse<Page<ESResult>> searchByTitleOrContent(String keyword, Integer page, Integer size, HttpServletRequest request){
-        int searchStatus = userService.getSearchStatus(request);
+        //校验搜索权限和获取租户码
+        User loginUser = userService.getLoginUser(request);
+        Integer searchStatus = loginUser.getSearchStatus();
+        String tenantCode = loginUser.getTenantCode();
         if (searchStatus == FOBBIN_ALL_STATUS) throw new BusinessException(ErrorCode.NO_AUTH,"无搜索权限");
-        Page<ESResult> esResults = esResultRepository.searchESResultByTitleOrContent(keyword, keyword, PageRequest.of(page-1, size));
+        //搜索
+        Page<ESResult> esResults = esResultRepository.searchESResultByTenantCodeAndTitleLikeOrContentLike(tenantCode, keyword, keyword,PageRequest.of(page-1, size));
         return ResultUtils.success(esResults);
     }
 
     @GetMapping("search-website")
     public BaseResponse<Page<ESResult>> searchByWebsite(String keyword,Integer page,Integer size, HttpServletRequest request){
-        int searchStatus = userService.getSearchStatus(request);
+        //校验搜索权限和获取租户码
+        User loginUser = userService.getLoginUser(request);
+        Integer searchStatus = loginUser.getSearchStatus();
+        String tenantCode = loginUser.getTenantCode();
         if (searchStatus != DEFAULT_STATUS) throw new BusinessException(ErrorCode.NO_AUTH,"无搜索权限");
-        Page<ESResult> esResults = esResultRepository.searchESResultByWebsiteLike(keyword, PageRequest.of(page-1, size));
+        //搜索
+        Page<ESResult> esResults = esResultRepository.searchESResultByTenantCodeAndWebsiteLike(tenantCode, keyword, PageRequest.of(page-1, size));
         return ResultUtils.success(esResults);
     }
 
     @GetMapping("search-type")
     public BaseResponse<Page<ESResult>> searchByType(String keyword,Integer page,Integer size, HttpServletRequest request){
-        int searchStatus = userService.getSearchStatus(request);
+        //校验搜索权限和获取租户码
+        User loginUser = userService.getLoginUser(request);
+        Integer searchStatus = loginUser.getSearchStatus();
+        String tenantCode = loginUser.getTenantCode();
         if (searchStatus != DEFAULT_STATUS) throw new BusinessException(ErrorCode.NO_AUTH,"无搜索权限");
-        Page<ESResult> esResults = esResultRepository.searchESResultByTypeLike(keyword, PageRequest.of(page-1, size));
+        //搜索
+        Page<ESResult> esResults = esResultRepository.searchESResultByTenantCodeAndType(tenantCode, keyword, PageRequest.of(page-1, size));
         return ResultUtils.success(esResults);
     }
 
-    @GetMapping("search-tenant")
-    public BaseResponse<Page<ESResult>> searchByTenantCode(String keyword,Integer page,Integer size, HttpServletRequest request){
-        int searchStatus = userService.getSearchStatus(request);
-        if (searchStatus != DEFAULT_STATUS) throw new BusinessException(ErrorCode.NO_AUTH,"无搜索权限");
-        Page<ESResult> esResults = esResultRepository.searchESResultByTenantCodeLike(keyword, PageRequest.of(page-1, size));
-        return ResultUtils.success(esResults);
-    }
 }
