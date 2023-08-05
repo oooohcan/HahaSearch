@@ -1,23 +1,17 @@
 package edu.zuel.hahasearch.dao;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+
 import edu.zuel.hahasearch.model.domain.ESResult;
 import edu.zuel.hahasearch.service.ESResultService;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.Query;
-
-import java.util.List;
 
 @SpringBootTest
 public class ESResultTest {
@@ -50,7 +44,7 @@ public class ESResultTest {
         esResult.setTitle("保存单个的测试");
         esResult.setContent("aaaahhhhhahaha");
         esResult.setWebsite("www.x.com");
-        esResult.setDate(new Date());
+        esResult.setTimestamp((new Date()).getTime());
         esResult.setTenantCode("zuel");
         //调用service层
         int i = esResultService.saveESResult(esResult);
@@ -73,6 +67,7 @@ public class ESResultTest {
             esResult.setImgUrl("https://img2.woyaogexing.com/2023/08/02/95eb842745c44516d3b33b96a1a16be1.jpg");
             esResult.setType("hhh");
             esResult.setTenantCode("zuel");
+            esResult.setTimestamp((new Date()).getTime());
             esResultList.add(esResult);
         }
         //调用dao层
@@ -91,7 +86,7 @@ public class ESResultTest {
             esResult.setImgUrl("https://img2.woyaogexing.com/2023/08/02/95eb842745c44516d3b33b96a1a16be1.jpg");
             esResult.setType("test");
             esResult.setTenantCode("zuel");
-            esResult.setDate(new Date());
+            esResult.setTimestamp((new Date()).getTime());
             esResultList.add(esResult);
         }
         // 调用service层

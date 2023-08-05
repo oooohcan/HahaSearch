@@ -14,5 +14,5 @@ public class ESAddOneRequest implements Serializable {
     private String imgUrl;      //图片地址（若有）
     private String type;        //文档类型
     private String tenantCode;  //租户码
-    private Date date;          //发布日期，格式示例: 2023-08-05T10:10:05.262Z
+    private long timestamp;     //发布日期
 }

@@ -33,6 +33,6 @@ public class ESResult {
     private String type;         //文档类型
     @Field(type = FieldType.Keyword)
     private String tenantCode;   //租户码
-    @Field(type = FieldType.Date,format = DateFormat.date_time)
-    private Date date;           //发布日期
+    @Field(type = FieldType.Date)
+    private long timestamp;      //发布日期
 }
