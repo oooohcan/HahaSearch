@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface ESResultRepository extends ElasticsearchRepository<ESResult,String> {
+    ESResult findESResultById(String id);
     @Highlight(fields = {
             @HighlightField(name = "title"),
             @HighlightField(name = "content")
@@ -19,7 +20,6 @@ public interface ESResultRepository extends ElasticsearchRepository<ESResult,Str
     Page<ESResult> searchESResultByTitleLikeOrContentLike(String title, String content, Pageable pageable);
     Page<ESResult> searchESResultByWebsiteLike(String website,Pageable pageable);
     Page<ESResult> searchESResultByTypeLike(String type,Pageable pageable);
-    Page<ESResult> findESResultById(String id,Pageable pageable);
 
     //这两个没有加like的模糊好用
     Page<ESResult> findESResultByTitleOrContent(String title, String content, Pageable pageable);

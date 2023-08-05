@@ -72,8 +72,7 @@ public class ESResultServiceImpl implements ESResultService {
 
     @Override
     public Page<ESResult> listESResult(Integer page,Integer size) {
-        Page<ESResult> results = esResultRepository.findAll(PageRequest.of(page, size));
-        return results;
+        return esResultRepository.findAll(PageRequest.of(page, size));
     }
 
 

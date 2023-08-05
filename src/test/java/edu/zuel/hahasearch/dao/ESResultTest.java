@@ -39,7 +39,7 @@ public class ESResultTest {
 //    }
 
     @Test
-    public void add(){
+    public void addOne(){
         ESResult esResult = new ESResult();
         esResult.setTitle("保存单个的测试");
         esResult.setContent("aaaahhhhhahaha");
@@ -94,7 +94,7 @@ public class ESResultTest {
      * 不带参数直接列出全部
      */
     @Test
-    public void findAllDoc(){
+    public void findAll(){
         Iterable<ESResult> esResultList = esResultRepository.findAll();
         esResultList.forEach(System.out::println);
     }
@@ -103,8 +103,8 @@ public class ESResultTest {
      * 匹配要求词的准确度较高
      */
     @Test
-    public void findDoc(){
-        Page<ESResult> esResultList = esResultRepository.findESResultByTitleOrContent("h","a",PageRequest.of(1,10));
+    public void findByX(){
+        Page<ESResult> esResultList = esResultRepository.findESResultByTitleOrContent("h","a", PageRequest.of(0,10));
         System.out.println(esResultList.getTotalElements());
         esResultList.forEach(System.out::println);
     }
@@ -113,8 +113,8 @@ public class ESResultTest {
      * 匹配要求词的准确度较高
      */
     @Test
-    public void searchDoc(){
-        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleOrContent("h","a",PageRequest.of(1,10));
+    public void searchByX(){
+        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleOrContent("h","a", PageRequest.of(0,10));
         esResultList.forEach(System.out::println);
     }
 
@@ -122,8 +122,8 @@ public class ESResultTest {
      * 可模糊搜索
      */
     @Test
-    public void searchLikeDoc(){
-        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleLikeOrContentLike("h","a",PageRequest.of(1,10));
+    public void searchLikeX(){
+        Page<ESResult> esResultList = esResultRepository.searchESResultByTitleLikeOrContentLike("h","a", PageRequest.of(0,10));
         esResultList.forEach(System.out::println);
     }
 
