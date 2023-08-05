@@ -218,6 +218,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return safetyUser;
     }
 
+    @Override
+    public int getSearchStatus(HttpServletRequest request) {
+        User loginUser = this.getLoginUser(request);
+        return loginUser.getSearchStatus();
+    }
 
 }
 
