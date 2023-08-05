@@ -51,6 +51,7 @@ public class ESResultTest {
         esResult.setContent("aaaahhhhhahaha");
         esResult.setWebsite("www.x.com");
         esResult.setDate(new Date());
+        esResult.setTenantCode("zuel");
         //调用service层
         int i = esResultService.saveESResult(esResult);
         System.out.println("service保存结果：" + i);
@@ -71,6 +72,7 @@ public class ESResultTest {
             esResult.setWebsite("www.baidu.com");
             esResult.setImgUrl("https://img2.woyaogexing.com/2023/08/02/95eb842745c44516d3b33b96a1a16be1.jpg");
             esResult.setType("hhh");
+            esResult.setTenantCode("zuel");
             esResultList.add(esResult);
         }
         //调用dao层
@@ -88,6 +90,7 @@ public class ESResultTest {
             esResult.setWebsite("www.hhh.com");
             esResult.setImgUrl("https://img2.woyaogexing.com/2023/08/02/95eb842745c44516d3b33b96a1a16be1.jpg");
             esResult.setType("test");
+            esResult.setTenantCode("zuel");
             esResult.setDate(new Date());
             esResultList.add(esResult);
         }

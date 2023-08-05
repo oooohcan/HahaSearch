@@ -20,17 +20,19 @@ import java.util.Date;
 public class ESResult {
     @Id
     @Field(type = FieldType.Keyword)
-    private String id;     //搜索结果ID
+    private String id;          //搜索结果ID
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
-    private String title;   //标题
+    private String title;        //标题
     @Field(type = FieldType.Text)
-    private String content; //内容
+    private String content;      //内容
     @Field(type = FieldType.Text)
-    private String website; //来源网站
+    private String website;      //来源网站
     @Field(type = FieldType.Keyword, index = false)
-    private String imgUrl;  //图片地址（若有）
+    private String imgUrl;       //图片地址（若有）
     @Field(type = FieldType.Keyword)
-    private String type;    //文档类型
+    private String type;         //文档类型
+    @Field(type = FieldType.Keyword)
+    private String tenantCode;   //租户码
     @Field(type = FieldType.Date,format = DateFormat.date_time)
-    private Date date;      //发布日期
+    private Date date;           //发布日期
 }

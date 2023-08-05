@@ -18,6 +18,7 @@ public interface ESResultRepository extends ElasticsearchRepository<ESResult,Str
     Page<ESResult> searchESResultByTitleLikeOrContentLike(String title, String content, Pageable pageable);
     Page<ESResult> searchESResultByWebsiteLike(String website,Pageable pageable);
     Page<ESResult> searchESResultByTypeLike(String type,Pageable pageable);
+    Page<ESResult> searchESResultByTenantCodeLike(String tenantCode,Pageable pageable);
 
     //这两个没有加like的模糊好用
     Page<ESResult> findESResultByTitleOrContent(String title, String content, Pageable pageable);

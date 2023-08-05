@@ -70,9 +70,10 @@ public class ESResultController {
         String website = esResult.getWebsite();
         String imgUrl = esResult.getImgUrl();
         String type = esResult.getType();
+        String tenantCode = esResult.getTenantCode();
         Date date = esResult.getDate();
         if(StringUtils.isBlank(id)) throw new BusinessException(ErrorCode.NULL_ERROR,"ID不能为空");
-        if(StringUtils.isAnyBlank(title,content,website,imgUrl,type)) throw new BusinessException(ErrorCode.NULL_ERROR,"请求参数不能存在空值");
+        if(StringUtils.isAnyBlank(title,content,website,imgUrl,type,tenantCode)) throw new BusinessException(ErrorCode.NULL_ERROR,"请求参数不能存在空值");
         if(date == null) throw new BusinessException(ErrorCode.NULL_ERROR,"日期不能为空");
         // 2、保存至es
         int result = esResultService.updateESResult(esResult);
