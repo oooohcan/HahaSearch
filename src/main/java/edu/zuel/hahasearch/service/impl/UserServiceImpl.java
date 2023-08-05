@@ -105,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         //2、加密密码后登入
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT+userPassword).getBytes());
-        //查询用户是否存，密码是否准确
+        //查询用户是否存在，密码是否准确
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_account",userAccount);
         queryWrapper.eq("user_pwd",encryptPassword);
@@ -218,6 +218,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return safetyUser;
     }
 
+    @Override
+    public int getSearchStatus(HttpServletRequest request) {
+        User loginUser = this.getLoginUser(request);
+        return loginUser.getSearchStatus();
+    }
 
 }
 

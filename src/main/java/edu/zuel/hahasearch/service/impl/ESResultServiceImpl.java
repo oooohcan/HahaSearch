@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +43,6 @@ public class ESResultServiceImpl implements ESResultService {
         }catch (Exception e){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,e.getMessage());
         }
-
         return 1;
     }
 

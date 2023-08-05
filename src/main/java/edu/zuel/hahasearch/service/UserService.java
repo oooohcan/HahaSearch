@@ -89,4 +89,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     User getSafetyUser(User user);
+
+    /**
+     * 获取用户搜索权限
+     * @param request
+     * @return
+     */
+    int getSearchStatus(HttpServletRequest request);
 }
