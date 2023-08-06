@@ -1,7 +1,9 @@
 import threading
+from pathlib import Path
 
 from Tenant import Tenant
 from Tasks import BasicTask
+from Config import FILE_PATH
 
 
 class TenantPool:
@@ -17,6 +19,9 @@ class TenantPool:
         with self.lock:
             if not code in self.tenants.keys():
                 self.tenants[code] = Tenant(code)
+        tenant_dir = Path(FILE_PATH) / str(code)
+        if not tenant_dir.exists():
+            tenant_dir.mkdir()
 
     # def get_tenant(self, code: str):
     #     with self.lock:

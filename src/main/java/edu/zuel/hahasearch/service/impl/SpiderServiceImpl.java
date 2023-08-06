@@ -123,7 +123,7 @@ public class SpiderServiceImpl extends ServiceImpl<SpiderMapper, Spider>
             jsonObject.put("visit_dir", visitDir);
             jsonObject.put("uname", uname);
             jsonObject.put("upwd", upwd);
-            if (deep > 0) {
+            if (deep >= 0) {
                 jsonObject.put("deep", deep);
             }
             JSONObject response = postRequest(ftpUrl, jsonObject);

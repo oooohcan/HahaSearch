@@ -31,6 +31,12 @@ def find_links(html: str) -> list:
     return [a['href'] for a in soup.find_all('a', href=True)]
 
 
+def find_title(html: str) -> str:
+    soup = BeautifulSoup(html, 'html.parser')
+    title = soup.select('title')
+    return title[0].text if len(title) > 0 else ''
+
+
 def response_wrong(msg):
     return jsonify({'code': 1, 'msg': msg})
 

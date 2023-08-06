@@ -5,8 +5,11 @@ import threading
 from time import sleep
 from random import randint
 from ftplib import FTP
+import json
+from datetime import datetime
 
 from ServeTools import *
+from Config import ES_ONE, FILE_SIZE, DOC_EX
 
 
 class BasicTask:
@@ -81,6 +84,28 @@ class BasicTask:
     def get_info(self) -> dict:
         pass
 
+    def add_es(self, content: str, date: int, title: str, ftype: str, website: str):
+        def do_post(data: dict):
+            jdata = json.dumps(data)
+            headers = {'Content-Type': 'application/json'}
+            try:
+                resopnse = requests.post(ES_ONE, data=jdata, headers=headers)
+                resopnse.raise_for_status()
+                res_data = resopnse.json()
+                if res_data['code'] != 0:
+                    raise Exception(res_data['msg'])
+            except Exception as e:
+                raise e
+
+        data = {
+            'content': content,
+            'date': date,
+            'title': title,
+            'type': ftype,
+            'website': website
+        }
+        do_post(data)
+
 
 class HttpTask(BasicTask):
 
@@ -137,7 +162,10 @@ class HttpTask(BasicTask):
 
     def save_html(self, html_content: str):
         # 保存网页内容为html文件
-        file_name = f'{self.save_name}_{self.success}.html'
+        sname = find_title(html_content)
+        if len(sname) == 0:
+            sname = self.save_name
+        file_name = f'{sname}_{self.success}.html'
         file_path = Path(self.save_path) / file_name
         if not Path(self.save_path).exists():
             Path(self.save_path).mkdir(parents=True)
@@ -163,6 +191,7 @@ class HttpTask(BasicTask):
         q = queue.Queue()
         q.put(self.target)
         self.total = 1
+        visit = set()
         while not q.empty() and level <= self.deep:
             with self.condition:
                 if self.cancelled:
@@ -180,8 +209,16 @@ class HttpTask(BasicTask):
                 html_text = self.get_html(url)
                 # 保存网页内容为html文件
                 self.save_html(html_text)
+
+                # 添加至ES
+                sname = find_title(html_text)
+                if len(sname) == 0:
+                    sname = self.save_name
+                file_name = f'{sname}_{self.success}.html'
+                local_path = Path(self.save_path) / file_name
+                self.add_es(str(local_path), int(datetime.now().timestamp()),
+                            sname, 'html', url)
             except Exception as e:
-                print(e)
                 self.fail += 1
                 continue
 
@@ -191,6 +228,9 @@ class HttpTask(BasicTask):
                 for link in links:
                     link = str(link)
                     if link.startswith('http'):
+                        if link in visit:
+                            continue
+                        visit.add(link)
                         q.put(link)
                         self.total += 1
                         temp = link
@@ -245,8 +285,13 @@ class FtpTask(BasicTask):
         t.start()
 
     def spider_ftp(self):
-        ftp = FTP(self.target)
-        ftp.login(self.uname, self.upwd)
+        try:
+            ftp = FTP(self.target)
+            ftp.login(self.uname, self.upwd)
+        except:
+            self.total += 1
+            self.fail += 1
+            return
 
         q = queue.Queue()
         q.put(self.visit_dir)
@@ -273,16 +318,34 @@ class FtpTask(BasicTask):
 
             files = ftp.nlst()
             for file in files:
-                file_path = dir + '/' + file
+                remote_path: str = dir + '/' + file
                 try:
-                    ftp.cwd(file_path)
+                    ftp.cwd(remote_path)
                     if level < self.deep:  # 广度遍历，当且仅当层数小于deep时才会继续遍历
-                        q.put(file_path)
+                        q.put(remote_path)
                         self.total += 1
-                        temp = file_path
+                        temp = remote_path
                     ftp.cwd('..')
                 except:
-                    print(f"访问文件:{self.target+file_path}")
+                    file_size = ftp.size(remote_path)
+                    file_ext = remote_path.rsplit('.', 1)[-1].lower()
+                    if file_size < FILE_SIZE or file_ext in DOC_EX:
+                        if not check_file_name(file):
+                            continue
+
+                        file_mod_time = ftp.sendcmd(f"MDTM {remote_path}")
+                        timestamp = int(datetime.strptime(
+                            file_mod_time[4:], "%Y%m%d%H%M%S").timestamp())
+                        if not Path(self.save_path).exists():
+                            Path(self.save_path).mkdir(parents=True)
+                        dfile = Path(self.save_path) / file
+                        with open(dfile, 'wb') as f:
+                            ftp.retrbinary('RETR ' + file, f.write)
+                        try:
+                            self.add_es(str(dfile), timestamp,
+                                        file, 'ftp', self.target+remote_path)
+                        except:
+                            pass
 
             if dir == last:
                 level += 1
