@@ -1,5 +1,4 @@
 package edu.zuel.hahasearch.controller;
-import java.util.Date;
 
 import edu.zuel.hahasearch.common.BaseResponse;
 import edu.zuel.hahasearch.common.ErrorCode;
