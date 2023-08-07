@@ -5,8 +5,9 @@
 1. 加载Maven文件，在pom.xml点击右上方图标自动装载（**必须**）
 2. 修改src/main/resources/application.yml中的数据库信息（**必须**）
 3. 安装elasticsearch 7.17.3，点击elasticsearch 7.17.3/bin/elasticsearch.bat启动搜索引擎（**必须**）
-4. 若需爬虫功能，点击spider/FlaskApp.py启动爬虫（**非必须**）
-5. 选择edu/zuel/hahasearch/HahaSearchApplication.java程序并启动（**必须**）
+4. 安装redis 5.0.14，点击redis/redis-server.exe启动redis（**必须**）
+5. 若需爬虫功能，点击spider/FlaskApp.py启动爬虫（**非必须**）
+6. 选择edu/zuel/hahasearch/HahaSearchApplication.java程序并启动（**必须**）
 
 
 ## CMD启动项目
