@@ -11,7 +11,7 @@
 
 
 ## CMD启动项目
-完成idea前4项前置后，执行以下命令
+完成idea前5项前置后，执行以下命令
 ```bash
 mvn package -DskipTests
 ```
