@@ -15,10 +15,13 @@ import edu.zuel.hahasearch.service.TemplateService;
 import edu.zuel.hahasearch.service.UserService;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/template")
@@ -29,6 +32,9 @@ public class TemplateController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping("/add")
     public BaseResponse<Long> addTemplate(@RequestBody TemplateAddRequest templateAddRequest, HttpServletRequest request){
@@ -69,11 +75,24 @@ public class TemplateController {
     @GetMapping("/list")
     public BaseResponse<Page<Template>> listTemplate(long current, long size, HttpServletRequest request){
         User loginUser = userService.getLoginUser(request);
+        // 创建redis键
+        String redisKey =String.format("hahasearch:template:list:%s",loginUser.getId());
+        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+        // 如果有缓存，直接读缓存
+        Page<Template> templatePage =(Page<Template>)valueOperations.get(redisKey);
+        if(templatePage != null) return ResultUtils.success(templatePage);
+        // 无缓存，查数据库
         QueryWrapper<Template> queryWrapper = new QueryWrapper<>();
         if(!userService.isAdmin(loginUser)){
             queryWrapper.eq("user_account",loginUser.getUserAccount()).or().eq("is_public",1);
         }
-        Page<Template> templatePage = templateService.page(new Page<>(current,size),queryWrapper);
+        templatePage = templateService.page(new Page<>(current,size),queryWrapper);
+        // 查完数据库写入redis缓存
+        try{
+            valueOperations.set(redisKey,templatePage,30000, TimeUnit.MILLISECONDS);
+        }catch (Exception e){
+            log.error("redis key is error",e);
+        }
         return ResultUtils.success(templatePage);
     }
 
