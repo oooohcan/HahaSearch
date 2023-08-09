@@ -29,6 +29,7 @@ import static edu.zuel.hahasearch.constant.UserConstant.*;
 @RestController
 @RequestMapping("/es")
 @Slf4j
+//@CrossOrigin(origins = {"http://localhost:9095"},allowCredentials = "true")
 public class ESResultController {
     @Autowired
     private ESResultService esResultService;

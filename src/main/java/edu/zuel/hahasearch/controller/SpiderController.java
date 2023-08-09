@@ -9,10 +9,7 @@ import edu.zuel.hahasearch.model.domain.User;
 import edu.zuel.hahasearch.model.request.*;
 import edu.zuel.hahasearch.service.SpiderService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +23,7 @@ import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/spider")
 @Slf4j
+//@CrossOrigin(origins = {"http://localhost:9095"},allowCredentials = "true")
 public class SpiderController {
     @Resource
     private SpiderService spiderService;
