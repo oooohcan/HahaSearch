@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/template")
 @Slf4j
+//@CrossOrigin(origins = {"http://localhost:9095"},allowCredentials = "true")
 public class TemplateController {
     @Resource
     private TemplateService templateService;

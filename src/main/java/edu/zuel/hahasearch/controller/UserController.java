@@ -25,6 +25,7 @@ import static edu.zuel.hahasearch.constant.UserConstant.USER_LOGIN_STATE;
 @RestController
 @RequestMapping("/user")
 @Slf4j
+//@CrossOrigin(origins = {"http://localhost:9095"},allowCredentials = "true")
 public class UserController {
     @Resource
     private UserService userService;
