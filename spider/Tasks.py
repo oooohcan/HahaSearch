@@ -13,7 +13,7 @@ from Config import ES_ONE, FILE_SIZE, DOC_EX
 
 
 class BasicTask:
-    def __init__(self, index: int, name: str):
+    def __init__(self, index: int, code: str, name: str):
         self.total = 0
         self.success = 0
         self.fail = 0
@@ -21,7 +21,10 @@ class BasicTask:
         self.waiting = True
         self.paused = False
         self.index = int(index)
+        if len(name) == 0 or len(code) == 0:
+            raise ValueError('name or code is empty')
         self.name = name
+        self.code = code
         # self.condition = threading.Lock()
         self.condition = threading.Condition()
 
@@ -84,7 +87,7 @@ class BasicTask:
     def get_info(self) -> dict:
         pass
 
-    def add_es(self, content: str, date: int, title: str, ftype: str, website: str):
+    def add_es(self, content: str, date: int, title: str, ftype: str, website: str, code: str):
         def do_post(data: dict):
             jdata = json.dumps(data)
             headers = {'Content-Type': 'application/json'}
@@ -102,15 +105,16 @@ class BasicTask:
             'date': date,
             'title': title,
             'type': ftype,
-            'website': website
+            'website': website,
+            "tenantCode": code
         }
         do_post(data)
 
 
 class HttpTask(BasicTask):
 
-    def __init__(self, index: int, name: str, target: str, save_path: str, deep: int = 0, headers: dict = dict()):
-        super().__init__(index, name)
+    def __init__(self, index: int, code: str, name: str, target: str, save_path: str, deep: int = 0, headers: dict = dict()):
+        super().__init__(index, code, name)
 
         if len(target) == 0:
             raise ValueError('url is empty')
@@ -217,7 +221,7 @@ class HttpTask(BasicTask):
                 file_name = f'{sname}_{self.success}.html'
                 local_path = Path(self.save_path) / file_name
                 self.add_es(str(local_path), int(datetime.now().timestamp()),
-                            sname, 'html', url)
+                            sname, 'html', url, self.code)
             except Exception as e:
                 self.fail += 1
                 continue
@@ -244,8 +248,8 @@ class HttpTask(BasicTask):
 
 
 class FtpTask(BasicTask):
-    def __init__(self, index: int, name: str, target: str, uname: str, upwd: str, visit_dir: str, save_path: str, deep: int = 0):
-        super().__init__(index, name)
+    def __init__(self, index: int, code: str, name: str, target: str, uname: str, upwd: str, visit_dir: str, save_path: str, deep: int = 0):
+        super().__init__(index, code, name)
 
         if len(str(target)) == 0:
             raise ValueError('url is empty')
@@ -343,7 +347,7 @@ class FtpTask(BasicTask):
                             ftp.retrbinary('RETR ' + file, f.write)
                         try:
                             self.add_es(str(dfile), timestamp,
-                                        file, 'ftp', self.target+remote_path)
+                                        file, 'ftp', self.target+remote_path, self.code)
                         except:
                             pass
 
