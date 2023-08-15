@@ -27,7 +27,7 @@ def create_http_serve(js: dict):
     if not tenantPool.check_tenant(code):
         tenantPool.add_tenant(code)
     try:
-        task = HttpTask(index, name, target, save_path, deep, headers)
+        task = HttpTask(index, code, name, target, save_path, deep, headers)
         tenantPool.add_task(code, task)
         return response_success('任务已添加')
     except Exception as e:
@@ -54,7 +54,7 @@ def create_ftp_serve(js: dict):
     if not tenantPool.check_tenant(code):
         tenantPool.add_tenant(code)
     try:
-        task = FtpTask(index, name, target, uname,
+        task = FtpTask(index, code, name, target, uname,
                        upwd, visit_dir, save_path, deep)
         tenantPool.add_task(code, task)
         return response_success('任务已添加')
